@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { moveCharacter } from './api.js';
+import { moveCharacter } from './api/api.js';
 import { Names } from './character.js';
 
-console.log('Hello, world!');
+console.log('Starting up!');
 
 moveCharacter(Names.Vaelric, 1, 0);
