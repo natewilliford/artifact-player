@@ -1,7 +1,16 @@
 import 'dotenv/config';
-import { moveCharacter } from './api/api.js';
+import { fight, moveCharacter } from './api/api.js';
 import { Names } from './character.js';
 
-console.log('Starting up!');
+const main = async () => {
+  console.log('Starting up!');
 
-moveCharacter(Names.Vaelric, 1, 0);
+  console.log('Moving Vaelric to 0, 1');
+  moveCharacter(Names.Vaelric, 0, 1);
+  // wait for 5 seconds (a little more than the cooldown)
+  await new Promise(resolve => setTimeout(resolve, 5100));
+  console.log('fighting.')
+  fight(Names.Vaelric);
+}
+
+main();

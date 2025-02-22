@@ -43,9 +43,30 @@ type CharacterSchema = {
   inventory: InventorySlot[];
 }
 
+type DropSchema = {
+  code: string;
+  quantity: number;
+}
+
+type FightSchema = {
+  xp: number;
+  gold: number;
+  drops: DropSchema[];
+  turns: number;
+  // ...
+  logs: string[];
+  result: 'win' | 'loss';
+}
+
 // Responses
 type CharacterMovementDataSchema = { 
   cooldown: CooldownSchema;
   destination: MapSchema;
+  character: CharacterSchema;
+}
+
+type CharacterFightDataSchema = {
+  cooldown: CooldownSchema;
+  fight: FightSchema;
   character: CharacterSchema;
 }
