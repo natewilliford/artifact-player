@@ -11,10 +11,12 @@
     "start": "npm run compile && node ./dist/src/index.js"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.4",
     "@types/node": "^22.13.5",
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "dotenv": "^16.4.7"
   }
 }
