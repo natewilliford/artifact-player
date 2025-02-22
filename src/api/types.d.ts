@@ -70,3 +70,12 @@ type CharacterFightDataSchema = {
   fight: FightSchema;
   character: CharacterSchema;
 }
+
+interface GameErrorError{
+  code: number;
+  message: string;
+}
+
+interface GameError {
+  error: GameErrorError;
+}
