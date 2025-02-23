@@ -1,16 +1,14 @@
 import { Character } from "./character.js";
 
+const characterMap = new Map<string, Character>();
 
-const characters = new Map<string, Character>();
-
-const getCharacter = (name) => {
-  if (characters.has(name)) {
-    return characters.get(name)
-  } else {
-    const character = new Character(name)
-    characters.set(name, character)
-    return character
+const characters = {
+  addCharacter: (c: Character) => {
+    characterMap.set(c.getName(), c)
+  },
+  getCharacter: (name) => {
+    return characterMap.get(name)
   }
 }
 
-export { characters, getCharacter }
+export { characterMap, characters }

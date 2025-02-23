@@ -1,5 +1,4 @@
 import { formatISO, parseISO } from "date-fns";
-import { Names } from "../character.js";
 
 type Pos = {
   x: number;
@@ -7,13 +6,12 @@ type Pos = {
 }
 
 export class Character {
-  name: Names;
   characterSchema: CharacterSchema;
   currentCooldown: CooldownSchema;
 
-  constructor(name: Names) {
-    this.name = name;
-   }
+  constructor(characterSchema: CharacterSchema) {
+    this.characterSchema = characterSchema
+  }
 
   updateCharacter(characterSchema: CharacterSchema, currentCooldown: CooldownSchema) {
     this.characterSchema = characterSchema;
@@ -30,6 +28,10 @@ export class Character {
     console.log('Current time is:', formatISO(now))
 
     return cooldownExpires
+  }
+
+  getName(): string {
+    return this.characterSchema.name
   }
 
   getPosition(): Pos {

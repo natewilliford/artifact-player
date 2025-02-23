@@ -10,6 +10,10 @@ interface FightResp {
   data: CharacterFightDataSchema
 }
 
+interface GetCharactersResp {
+  data: CharacterSchema[]
+}
+
 const handleError = (err: any) => {
   const error = err as Error | AxiosError;
   if(axios.isAxiosError(error)) {
@@ -21,6 +25,14 @@ const handleError = (err: any) => {
 } 
 
 export default {
+  getCharacters: async () => {
+    try {
+      const res: AxiosResponse<GetCharactersResp> = await axiosInstance.get('/my/characters')
+      return res?.data?.data
+    } catch (err) {
+      handleError(err)
+    }
+  },
   moveCharacter: async (characterName: string, x: number, y: number): Promise<CharacterMovementDataSchema> => {
     try {
       const res: AxiosResponse<MoveResp> = await axiosInstance.post(`/my/${characterName}/action/move`, {

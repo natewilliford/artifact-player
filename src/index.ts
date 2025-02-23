@@ -1,47 +1,37 @@
 import 'dotenv/config';
-import { exit, stdin as input, stdout as output } from 'node:process';
+import { stdin as input, stdout as output } from 'node:process';
 import * as readline from 'node:readline/promises';
-import { Command, commands } from './commands.js';
+import { processCommand, ProcessCommandCode } from './cli/commandProcessor.js';
+import actions from './actions/actions.js';
 
 const main = async () => {
   console.log('Starting up!');
 
+  console.log("Loading characters.")
+  const res = await actions.loadCharacters()
+  
   const rl = readline.createInterface({ input, output })
+  let quitting = false
   try {
-    while(true) {
+    while(!quitting) {
       try {
         const answer = await rl.question("command: ")
-
-        const answerParts = answer.split(' ')
-        if (answerParts.length < 1) {
-          throw new Error("no command")
-        } 
-        const commandString = answerParts[0].toLowerCase()
-        const args = answerParts.slice(1)
-        if (commandString in commands) {
-          const command = commands[commandString]
-          switch(command) {
-            case Command.Quit: 
-              console.log("Quitting.")
-              exit()
-              break;
-            case Command.Move:
-              console.log("Move command. args: ", args)
-              break
-            case Command.Fight:
-              console.log("Fight command. args: ", args)
-              break
-            default:
-              throw new Error("Unrecognized command: " + commandString)
-          }
-        } else {
-          throw new Error("Unrecognized command: " + commandString)
+        const commandCode = processCommand(answer)
+        switch (commandCode) {
+          case ProcessCommandCode.Unrecognized:
+            throw new Error("Unrecognized command.")
+          case ProcessCommandCode.Quit:
+            console.log("Quitting.")
+            quitting = true
+          case ProcessCommandCode.Done:
+            // Expected. Do nothing.
+            break
+          default: 
+            console.error("Unrecognized process command code: " + commandCode)
         }
-
-        console.log(`echo: ${answer}`)
       } catch (err) {
-        console.error("Input error", err) 
-      } 
+        console.error(err) 
+      }
     }
   } finally {
     rl.close()

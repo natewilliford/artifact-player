@@ -1,16 +1,17 @@
 
 enum Command {
   Quit,
+  List,
   Move, 
   Fight,
-
 }
 
-const commands: { [key: string]: Command} = {
+const commandsMap: { [key: string]: Command} = {
   "quit": Command.Quit,
   "exit": Command.Quit,
+  "list": Command.List,
   "move": Command.Move,
   "fight": Command.Fight
 }
 
-export { Command, commands }
+export { Command, commandsMap }
