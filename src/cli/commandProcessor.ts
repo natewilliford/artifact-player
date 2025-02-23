@@ -1,6 +1,8 @@
+import { addISOWeekYears } from "date-fns"
 import actions from "../actions/actions.js"
 import { characterMap } from "../gamestate/characters.js"
 import { Command, commandsMap } from "./commands.js"
+import { runProgram } from "../ai/ai.js"
 
 enum ProcessCommandCode {
   Done,
@@ -42,6 +44,13 @@ const stats = (args: string[]) => {
   actions.printStats(args[0])
 }
 
+const runProgramCmd = (args: string[]) => {
+  if (args.length != 1) {
+    throw new Error("Must have 1 arg: name. args: " + args)
+  }
+  runProgram(args[0])
+} 
+
 const processCommand = async (input: string): Promise<ProcessCommandCode> => {
   let inputParts = input.split(' ')
   if (inputParts.length < 1) {
@@ -71,6 +80,10 @@ const processCommand = async (input: string): Promise<ProcessCommandCode> => {
         return ProcessCommandCode.Done
       case Command.Stats:
         stats(args) 
+        return ProcessCommandCode.Done
+      case Command.RunProgram:
+        // Don't await so we can do other stuff.
+        runProgramCmd(args)
         return ProcessCommandCode.Done
       default:
         return ProcessCommandCode.Unrecognized
