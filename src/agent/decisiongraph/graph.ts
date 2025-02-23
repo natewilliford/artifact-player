@@ -20,7 +20,7 @@ const buildNode = (nodeId: string, op: Operation) => {
 }
 
 class Graph {
-  startingNode: Node
+  startingNode?: Node
 
   // Nodes indexed on node id
   nodes: Map<string, Node> = new Map()

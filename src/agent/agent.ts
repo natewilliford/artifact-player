@@ -25,8 +25,12 @@ const runProgram = async (name: string) => {
 
 const runGraph = async (graph: Graph) => {
   let running = true
-  let node: Node = graph.startingNode
-  while(running) {
+  let node = graph.startingNode
+  while(running) {  
+    if (!node) {
+      console.warn(`Null node.`)
+      break
+    }
     console.log("Current node: " + node.id)
     if (node.id === "end") {
       console.log("We are at the end node.")
@@ -51,6 +55,7 @@ const runGraph = async (graph: Graph) => {
         if (!node) {
           console.warn(`Null node with id ${e.toNodeId}`)
           running = false
+          break
         }
         shouldContinue = true
         break
@@ -58,8 +63,8 @@ const runGraph = async (graph: Graph) => {
     }
     if (shouldContinue) continue
 
-    console.log(`Doing operation for node ${node.id}`)
-    await node.doOperation()
+    console.log(`Doing operation for node ${node?.id}`)
+    await node?.doOperation()
     console.log("Operation done")
   }
 }

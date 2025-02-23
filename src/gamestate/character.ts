@@ -7,8 +7,8 @@ export type Pos = {
 
 export class Character {
   characterSchema: CharacterSchema
-  currentCooldown: CooldownSchema
-  localCooldownStart: Date
+  currentCooldown: CooldownSchema | undefined
+  localCooldownStart: Date | undefined
 
   constructor(characterSchema: CharacterSchema) {
     this.characterSchema = characterSchema
