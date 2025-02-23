@@ -14,9 +14,6 @@ export default {
   },
   moveCharacter: async (characterName: string, x: number, y: number) => {
     const character = characters.getCharacter(characterName)
-    if (!character) {
-      throw new Error("Character not found: " + characterName)
-    }
     const res = await api.moveCharacter(character.getName(), x, y)
     if (res) {
       character.updateCharacter(res.character, res.cooldown);
@@ -27,9 +24,6 @@ export default {
   },
   fight: async (characterName: string) => {
     const character = characters.getCharacter(characterName)
-    if (!character) {
-      throw new Error("Character not found: " + characterName)
-    }
     const res = await api.fight(character.getName())
     if (res) {
       character.updateCharacter(res.character, res.cooldown)
@@ -38,9 +32,6 @@ export default {
   },
   rest: async (characterName: string) => {
     const character = characters.getCharacter(characterName)
-    if (!character) {
-      throw new Error("Character not found: " + characterName)
-    }
     const res = await api.rest(character.getName())
     if (res) {
       character.updateCharacter(res.character, res.cooldown)
@@ -64,5 +55,16 @@ export default {
         console.log(`  ${inv.slot}: ${inv.quantity}x - ${inv.code}`)
       }
     })
+  },
+  gather: async (characterName: string) => {
+    const character = characters.getCharacter(characterName)
+    const res = await api.gather(character.getName())
+    if (res) {
+      character.updateCharacter(res.character, res.cooldown)
+      console.log(`${character.getName()} gathered and gained ${res.details.xp}xp and items:`)
+      res.details.items.forEach(i => {
+        console.log(`  ${i.quantity}x - ${i.code}`)
+      })
+    }
   }
 }

@@ -48,7 +48,14 @@ const runProgramCmd = (args: string[]) => {
     throw new Error("Must have 1 arg: name. args: " + args)
   }
   runProgram(args[0])
-} 
+}
+
+const gather = (args: string[]) => {
+  if (args.length != 1) {
+    throw new Error("Must have 1 arg: name. args: " + args)
+  }
+  actions.gather(args[0])
+}
 
 const processCommand = async (input: string): Promise<ProcessCommandCode> => {
   let inputParts = input.split(' ')
@@ -79,6 +86,9 @@ const processCommand = async (input: string): Promise<ProcessCommandCode> => {
         return ProcessCommandCode.Done
       case Command.Stats:
         stats(args) 
+        return ProcessCommandCode.Done
+      case Command.Gather:
+        await gather(args)
         return ProcessCommandCode.Done
       case Command.RunProgram:
         // Don't await so we can do other stuff.

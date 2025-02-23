@@ -1,7 +1,7 @@
 
 import { Character } from "../gamestate/character.js"
 import { characters } from "../gamestate/characters.js"
-import { Graph } from "./decisiongraph/graph.js"
+import { Graph, Node } from "./decisiongraph/graph.js"
 import { buildChickenFightGraph } from "./graphs/chickenFightGraph.js"
 
 const runProgram = async (name: string) => {
@@ -25,7 +25,7 @@ const runProgram = async (name: string) => {
 
 const runGraph = async (graph: Graph) => {
   let running = true
-  let node = graph.startingNode
+  let node: Node = graph.startingNode
   while(running) {
     console.log("Current node: " + node.id)
     if (node.id === "end") {

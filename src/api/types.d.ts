@@ -85,3 +85,14 @@ type GameErrorError = {
 type GameError = {
   error: GameErrorError;
 }
+
+type SkillInfoSchema = {
+  xp: number,
+  items: DropSchema[]
+}
+
+type SkillDataSchema = {
+  cooldown: CooldownSchema
+  details: SkillInfoSchema
+  character: CharacterSchema
+}

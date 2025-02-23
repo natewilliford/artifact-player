@@ -2,6 +2,7 @@ import { Character, Pos } from "../../gamestate/character.js";
 import { cooldownOperation, fightOperation, moveOperation, noop, restOperation } from "../operations.js";
 import { buildNode, Graph } from "../decisiongraph/graph.js";
 import { alwaysTrigger, atPositionTrigger, cooldownDoneTrigger, fullHealthTrigger, hasCooldownTrigger, lowHealthTrigger, reachedLevelTrigger } from "../triggers.js";
+import { addCooldownNode } from "./helpers.js";
 
 type ChickenFightGraphParams = {
   character: Character
@@ -43,11 +44,3 @@ export const buildChickenFightGraph = (params: ChickenFightGraphParams): Graph =
   return g
 }
 
-const addCooldownNode = (g: Graph, nodeId: string, c: Character) => {
-  const cdNode = buildNode(nodeId + "-cooldown", cooldownOperation(c))
-  g.addNode(cdNode)
-  // Edge transfering to the cooldown node.
-  g.addEdge(nodeId, cdNode.id, hasCooldownTrigger(c))
-  // Edge transfering back to the normal node.
-  g.addEdge(cdNode.id, nodeId, cooldownDoneTrigger(c))
-}
