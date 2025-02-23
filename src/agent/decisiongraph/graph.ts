@@ -1,12 +1,22 @@
+type Trigger = (() => boolean)
+type Action = () => Promise<void>
+
 type Edge = {
-  shouldTrigger(): boolean
+  shouldTrigger: Trigger
   fromNodeId: string
   toNodeId: string
 }
 
 type Node = {
   id: string
-  doAction(): Promise<void>
+  doAction: Action
+}
+
+const buildNode = (nodeId: string, action: Action) => {
+  return {
+    id: nodeId,
+    doAction: action
+  }
 }
 
 class Graph {
@@ -25,7 +35,16 @@ class Graph {
     this.nodes.set(n.id, n)
   }
 
-  addEdge(e: Edge) {
+  buildAndAddNode(nodeId: string, action: Action) {
+    this.addNode(buildNode(nodeId, action))
+  }
+
+  addEdge(fromNode: string, toNode: string, condition: () => boolean) {
+    const e: Edge = {
+      fromNodeId: fromNode,
+      toNodeId: toNode,
+      shouldTrigger: condition
+    }
     const existingFromNodeList = this.edges.get(e.fromNodeId)
     if (existingFromNodeList) {
       existingFromNodeList.push(e)
@@ -35,4 +54,4 @@ class Graph {
   }
 }
 
-export { Edge, Node, Graph }
+export { Trigger, Action, Node, buildNode, Graph }

@@ -1,6 +1,7 @@
 
 import { Character } from "../gamestate/character.js"
 import { characters } from "../gamestate/characters.js"
+import { Graph } from "./decisiongraph/graph.js"
 import { buildChickenFightGraph } from "./graphs/chickenFightGraph.js"
 
 const runProgram = async (name: string) => {
@@ -19,6 +20,10 @@ const runProgram = async (name: string) => {
     targetLevel: 2
   })
 
+  await runGraph(graph)
+}
+
+const runGraph = async (graph: Graph) => {
   let running = true
   let node = graph.startingNode
   while(running) {
@@ -36,6 +41,8 @@ const runProgram = async (name: string) => {
       running = false
       continue
     }
+    // Reset the loop (can't just call continue in the inner for loop).
+    let shouldContinue = false
     for (let i = 0; i < edges.length; i++) {
       let e = edges[i]
       if (e.shouldTrigger()) {
@@ -45,9 +52,11 @@ const runProgram = async (name: string) => {
           console.warn(`Null node with id ${e.toNodeId}`)
           running = false
         }
-        continue
+        shouldContinue = true
+        break
       }
     }
+    if (shouldContinue) continue
 
     console.log(`Doing action for node ${node.id}`)
     await node.doAction()
