@@ -1,8 +1,7 @@
-import { addISOWeekYears } from "date-fns"
 import actions from "../actions/actions.js"
+import { runProgram } from "../agent/agent.js"
 import { characterMap } from "../gamestate/characters.js"
 import { Command, commandsMap } from "./commands.js"
-import { runProgram } from "../ai/ai.js"
 
 enum ProcessCommandCode {
   Done,
@@ -93,4 +92,4 @@ const processCommand = async (input: string): Promise<ProcessCommandCode> => {
   }
 }
 
-export { ProcessCommandCode, processCommand }
+export { processCommand, ProcessCommandCode }

@@ -1,6 +1,6 @@
 import { addSeconds } from "date-fns";
 
-type Pos = {
+export type Pos = {
   x: number;
   y: number;
 }
