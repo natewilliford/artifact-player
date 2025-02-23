@@ -71,11 +71,17 @@ type CharacterFightDataSchema = {
   character: CharacterSchema;
 }
 
-interface GameErrorError{
+type CharacterRestDataSchema = {
+  cooldown: CooldownSchema;
+  hp_restored: number;
+  character: CharacterSchema;
+}
+
+type GameErrorError = {
   code: number;
   message: string;
 }
 
-interface GameError {
+type GameError = {
   error: GameErrorError;
 }

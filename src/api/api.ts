@@ -1,19 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance } from "../axios.js";
 
-
-interface MoveResp {
-  data: CharacterMovementDataSchema
-}
-
-interface FightResp {
-  data: CharacterFightDataSchema
-}
-
-interface GetCharactersResp {
-  data: CharacterSchema[]
-}
-
 const handleError = (err: any) => {
   const error = err as Error | AxiosError;
   if(axios.isAxiosError(error)) {
@@ -27,15 +14,16 @@ const handleError = (err: any) => {
 export default {
   getCharacters: async () => {
     try {
-      const res: AxiosResponse<GetCharactersResp> = await axiosInstance.get('/my/characters')
+      const res = await axiosInstance.get('/my/characters')
       return res?.data?.data
     } catch (err) {
       handleError(err)
     }
   },
+
   moveCharacter: async (characterName: string, x: number, y: number): Promise<CharacterMovementDataSchema> => {
     try {
-      const res: AxiosResponse<MoveResp> = await axiosInstance.post(`/my/${characterName}/action/move`, {
+      const res = await axiosInstance.post(`/my/${characterName}/action/move`, {
         x: x,
         y: y
       })
@@ -47,16 +35,19 @@ export default {
 
   fight: async (characterName: string): Promise<CharacterFightDataSchema> => {
     try {
-      const res: AxiosResponse<FightResp> = await axiosInstance.post(`/my/${characterName}/action/fight`)
+      const res = await axiosInstance.post(`/my/${characterName}/action/fight`)
       return res?.data?.data
     } catch (err) {
       handleError(err)
     }
-      // .then((response) => {
-      //   const fightResp = response.data.data as CharacterFightDataSchema;
-      //   console.log("Result: " + fightResp.fight.result + " - " + fightResp.fight.logs[0]);
-      // }).catch((error) => {
-      //   console.error(error);
-      // })
+  },
+
+  rest: async (characterName: string): Promise<CharacterRestDataSchema> => {
+    try {
+      const res = await axiosInstance.post(`/my/${characterName}/action/rest`)
+      return res?.data?.data
+    } catch (err) {
+      handleError(err)
+    }
   }
 }

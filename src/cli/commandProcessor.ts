@@ -28,6 +28,13 @@ const fight = async (args: string[]) => {
   await actions.fight(args[0])
 }
 
+const rest = async (args: string[]) => {
+  if (args.length != 1) {
+    throw new Error("Must have 1 arg: name. args: " + args)
+  }
+  await actions.rest(args[0])
+}
+
 const processCommand = (input: string): ProcessCommandCode => {
   let inputParts = input.split(' ')
   if (inputParts.length < 1) {
@@ -51,6 +58,9 @@ const processCommand = (input: string): ProcessCommandCode => {
         return ProcessCommandCode.Done
       case Command.Fight:
         fight(args)
+        return ProcessCommandCode.Done
+      case Command.Rest:
+        rest(args) 
         return ProcessCommandCode.Done
       default:
         return ProcessCommandCode.Unrecognized

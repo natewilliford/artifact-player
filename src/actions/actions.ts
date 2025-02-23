@@ -34,5 +34,16 @@ export default {
       character.updateCharacter(res.character, res.cooldown)
       console.log("Fight result: " + res.fight.result + " - " + res.fight.logs[0]);
     }
+  },
+  rest: async (characterName: string) => {
+    const character = characters.getCharacter(characterName)
+    if (!character) {
+      throw new Error("Character not found: " + characterName)
+    }
+    const res = await api.rest(character.getName())
+    if (res) {
+      character.updateCharacter(res.character, res.cooldown)
+      console.log(`${character.getName()} rested and restored ${res.hp_restored} hp.`)
+    }
   }
 }
