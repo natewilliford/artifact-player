@@ -1,5 +1,5 @@
 type Trigger = (() => boolean)
-type Action = () => Promise<void>
+type Operation = () => Promise<void>
 
 type Edge = {
   shouldTrigger: Trigger
@@ -9,13 +9,13 @@ type Edge = {
 
 type Node = {
   id: string
-  doAction: Action
+  doOperation: Operation
 }
 
-const buildNode = (nodeId: string, action: Action) => {
+const buildNode = (nodeId: string, op: Operation) => {
   return {
     id: nodeId,
-    doAction: action
+    doOperation: op
   }
 }
 
@@ -35,8 +35,8 @@ class Graph {
     this.nodes.set(n.id, n)
   }
 
-  buildAndAddNode(nodeId: string, action: Action) {
-    this.addNode(buildNode(nodeId, action))
+  buildAndAddNode(nodeId: string, op: Operation) {
+    this.addNode(buildNode(nodeId, op))
   }
 
   addEdge(fromNode: string, toNode: string, condition: () => boolean) {
@@ -54,4 +54,4 @@ class Graph {
   }
 }
 
-export { Trigger, Action, Node, buildNode, Graph }
+export { Trigger, Operation, Node, buildNode, Graph }

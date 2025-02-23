@@ -46,4 +46,4 @@ export const hasCooldownTrigger = (c: Character): Trigger => {
 
 export const cooldownDoneTrigger = (c: Character): Trigger => {
   return () => c.getCooldownSecondsRemaining() === 0
-} 
+}

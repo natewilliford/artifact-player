@@ -58,9 +58,9 @@ const runGraph = async (graph: Graph) => {
     }
     if (shouldContinue) continue
 
-    console.log(`Doing action for node ${node.id}`)
-    await node.doAction()
-    console.log("Action done")
+    console.log(`Doing operation for node ${node.id}`)
+    await node.doOperation()
+    console.log("Operation done")
   }
 }
 

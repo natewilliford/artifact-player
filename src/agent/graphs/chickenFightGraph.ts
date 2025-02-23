@@ -1,5 +1,5 @@
 import { Character, Pos } from "../../gamestate/character.js";
-import { cooldownAction, fightAction, moveAction, noopAction, restAction } from "../actions.js";
+import { cooldownOperation, fightOperation, moveOperation, noop, restOperation } from "../operations.js";
 import { buildNode, Graph } from "../decisiongraph/graph.js";
 import { alwaysTrigger, atPositionTrigger, cooldownDoneTrigger, fullHealthTrigger, hasCooldownTrigger, lowHealthTrigger, reachedLevelTrigger } from "../triggers.js";
 
@@ -15,19 +15,19 @@ export const buildChickenFightGraph = (params: ChickenFightGraphParams): Graph =
   const g = new Graph()
 
   // Nodes
-  g.startingNode = buildNode("start",  noopAction)
+  g.startingNode = buildNode("start",  noop)
   g.addNode(g.startingNode)
 
   // 1. Move to location
-  g.buildAndAddNode("move", moveAction(c, params.fightLocation))
+  g.buildAndAddNode("move", moveOperation(c, params.fightLocation))
   addCooldownNode(g, "move", c)
 
   // 2. Fight
-  g.buildAndAddNode("fight", fightAction(c))
+  g.buildAndAddNode("fight", fightOperation(c))
   addCooldownNode(g, "fight", c)
 
   // 3. Heal
-  g.addNode(buildNode("heal", restAction(c)))
+  g.addNode(buildNode("heal", restOperation(c)))
   addCooldownNode(g, "heal", c)
 
   // 4. End 
@@ -44,7 +44,7 @@ export const buildChickenFightGraph = (params: ChickenFightGraphParams): Graph =
 }
 
 const addCooldownNode = (g: Graph, nodeId: string, c: Character) => {
-  const cdNode = buildNode(nodeId + "-cooldown", cooldownAction(c))
+  const cdNode = buildNode(nodeId + "-cooldown", cooldownOperation(c))
   g.addNode(cdNode)
   // Edge transfering to the cooldown node.
   g.addEdge(nodeId, cdNode.id, hasCooldownTrigger(c))
