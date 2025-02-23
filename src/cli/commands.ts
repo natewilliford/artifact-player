@@ -5,6 +5,7 @@ enum Command {
   Move, 
   Fight,
   Rest,
+  Stats,
 }
 
 const commandsMap: { [key: string]: Command} = {
@@ -15,6 +16,7 @@ const commandsMap: { [key: string]: Command} = {
   "move": Command.Move,
   "fight": Command.Fight,
   "rest": Command.Rest,
+  "stats": Command.Stats,
 }
 
 export { Command, commandsMap }

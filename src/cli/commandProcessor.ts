@@ -35,7 +35,14 @@ const rest = async (args: string[]) => {
   await actions.rest(args[0])
 }
 
-const processCommand = (input: string): ProcessCommandCode => {
+const stats = (args: string[]) => {
+  if (args.length != 1) {
+    throw new Error("Must have 1 arg: name. args: " + args)
+  }
+  actions.printStats(args[0])
+}
+
+const processCommand = async (input: string): Promise<ProcessCommandCode> => {
   let inputParts = input.split(' ')
   if (inputParts.length < 1) {
     throw new Error("no command")
@@ -54,13 +61,16 @@ const processCommand = (input: string): ProcessCommandCode => {
         });
         return ProcessCommandCode.Done
       case Command.Move:
-        move(args)
+        await move(args)
         return ProcessCommandCode.Done
       case Command.Fight:
-        fight(args)
+        await fight(args)
         return ProcessCommandCode.Done
       case Command.Rest:
-        rest(args) 
+        await rest(args) 
+        return ProcessCommandCode.Done
+      case Command.Stats:
+        stats(args) 
         return ProcessCommandCode.Done
       default:
         return ProcessCommandCode.Unrecognized

@@ -22,6 +22,7 @@ export default {
       character.updateCharacter(res.character, res.cooldown);
       const newPos = character.getPosition()
       console.log(character.getName() + " moved to " + newPos.x + ", " + newPos.y + " - " +  res.destination.name);
+      character.getCoolDownExpiration()
     }
   },
   fight: async (characterName: string) => {
@@ -45,5 +46,23 @@ export default {
       character.updateCharacter(res.character, res.cooldown)
       console.log(`${character.getName()} rested and restored ${res.hp_restored} hp.`)
     }
+  },
+  printStats: (characterName: string) => {
+    const character = characters.getCharacter(characterName)
+    if (!character) {
+      throw new Error("Character not found: " + characterName)
+    }
+    const cs = character.characterSchema
+    console.log(`Cooldown: ${character.getCooldownSecondsRemaining()}s`)
+    console.log(`Hp:     ${cs.hp}/${cs.max_hp}`)
+    console.log(`Level:  ${cs.level}`)
+    console.log(`Xp:     ${cs.xp}/${cs.max_xp}`)
+    console.log(`Gold:   ${cs.gold}`)
+    console.log(`Inventory: `)
+    cs.inventory.forEach(inv => {
+      if (inv.quantity > 0) {
+        console.log(`  ${inv.slot}: ${inv.quantity}x - ${inv.code}`)
+      }
+    })
   }
 }

@@ -1,4 +1,4 @@
-import { formatISO, parseISO } from "date-fns";
+import { addSeconds } from "date-fns";
 
 type Pos = {
   x: number;
@@ -6,28 +6,33 @@ type Pos = {
 }
 
 export class Character {
-  characterSchema: CharacterSchema;
-  currentCooldown: CooldownSchema;
+  characterSchema: CharacterSchema
+  currentCooldown: CooldownSchema
+  localCooldownStart: Date
 
   constructor(characterSchema: CharacterSchema) {
     this.characterSchema = characterSchema
   }
 
   updateCharacter(characterSchema: CharacterSchema, currentCooldown: CooldownSchema) {
-    this.characterSchema = characterSchema;
-    this.currentCooldown = currentCooldown;
+    this.characterSchema = characterSchema
+    this.currentCooldown = currentCooldown
+    this.localCooldownStart = new Date()
   }
 
   getCoolDownExpiration(): Date {
-    console.log("in state: " + this.currentCooldown.expiration)
+    if (!this.localCooldownStart || !this.currentCooldown) {
+      return new Date()
+    }
 
-    const cooldownExpires = parseISO(this.currentCooldown.expiration)
+    return addSeconds(this.localCooldownStart, this.currentCooldown.total_seconds)
+  }
+
+  getCooldownSecondsRemaining(): number {
     const now = new Date()
-
-    console.log('Cooldown expires at:', formatISO(cooldownExpires))
-    console.log('Current time is:', formatISO(now))
-
-    return cooldownExpires
+    // Use millis directly since date-fns Durations don't include milliseconds.
+    const millis = Math.max(this.getCoolDownExpiration().getTime() - now.getTime(), 0)
+    return millis / 1000
   }
 
   getName(): string {
