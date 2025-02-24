@@ -172,3 +172,20 @@ export type RewardDataSchema = {
   rewards: RewardsSchema
   character: CharacterSchema
 }
+
+export type BankItemTransactionSchema = {
+  cooldown: CooldownSchema
+  item: ItemSchema
+  bank: SimpleItemSchema[]
+  character: CharacterSchema
+}
+
+export type GoldSchema = {
+  quantity: number
+}
+
+export type BankGoldTransactionSchema = {
+  cooldown: CooldownSchema
+  bank: GoldSchema
+  character: CharacterSchema
+}

@@ -146,7 +146,43 @@ export default {
     } else {
       console.log('No task in progress')
     }
-  }
+  },
+  depositBank: async (name: string, code: string, quantity: number) => {
+    const character = characters.getCharacter(name)
+    const res = await api.depositBank(name, code, quantity)
+    if (res.data) {
+      character.updateCharacter(res.data.character)
+      console.log(`${character.getName()} deposited ${quantity}x ${res.data.item.code}`)
+    }
+    return res.error
+  },
+  withdrawBank: async (name: string, code: string, quantity: number) => {
+    const character = characters.getCharacter(name)
+    const res = await api.withdrawBank(name, code, quantity)
+    if (res.data) {
+      character.updateCharacter(res.data.character)
+      console.log(`${character.getName()} withdrew ${quantity}x ${res.data.item.code}`)
+    }
+    return res.error
+  },
+  depositBankGold: async (name: string, quantity: number) => {
+    const character = characters.getCharacter(name)
+    const res = await api.depositBankGold(name, quantity)
+    if (res.data) {
+      character.updateCharacter(res.data.character)
+      console.log(`${character.getName()} deposited ${quantity}g`)
+    }
+    return res.error
+  },
+  withdrawBankGold: async (name: string, quantity: number) => {
+    const character = characters.getCharacter(name)
+    const res = await api.withdrawBankGold(name, quantity)
+    if (res.data) {
+      character.updateCharacter(res.data.character)
+      console.log(`${character.getName()} withdrew ${quantity}g`)
+    }
+    return res.error
+  },
 }
 
 const logRewards = (rewards: RewardsSchema) => {

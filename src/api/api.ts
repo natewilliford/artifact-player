@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { axiosInstance } from "../axios.js";
-import { CharacterFightDataSchema, CharacterMovementDataSchema, CharacterRestDataSchema, CharacterSchema, EquipRequestSchema, GameError, RewardDataSchema, SkillDataSchema, Slot, TaskDataSchema, TaskFullSchema } from "./types.js";
+import { BankGoldTransactionSchema, BankItemTransactionSchema, CharacterFightDataSchema, CharacterMovementDataSchema, CharacterRestDataSchema, CharacterSchema, EquipRequestSchema, GameError, RewardDataSchema, SkillDataSchema, Slot, TaskDataSchema, TaskFullSchema } from "./types.js";
 
 type ApiResponse<T> = {
   data?: T
@@ -43,6 +43,18 @@ export default {
   },
   completeTask: async (name: string): Promise<ApiResponse<RewardDataSchema>> => {
     return await doPost(`/my/${name}/action/task/complete`)
+  },
+  depositBank: async (name: string, code: string, quantity: number): Promise<ApiResponse<BankItemTransactionSchema>> => {
+    return await doPost(`/my/${name}/action/bank/deposit`, { code, quantity })
+  },
+  withdrawBank: async (name: string, code: string, quantity: number): Promise<ApiResponse<BankItemTransactionSchema>> => {
+    return await doPost(`/my/${name}/action/bank/withdraw`, { code, quantity })
+  },
+  depositBankGold: async (name: string, quantity: number): Promise<ApiResponse<BankGoldTransactionSchema>> => {
+    return await doPost(`/my/${name}/action/bank/deposit/gold`, { quantity })
+  },
+  withdrawBankGold: async (name: string, quantity: number): Promise<ApiResponse<BankGoldTransactionSchema>> => {
+    return await doPost(`/my/${name}/action/bank/withdraw/gold`, { quantity })
   },
 }
 

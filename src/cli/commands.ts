@@ -17,6 +17,8 @@ export const buildCommands = (): CommandObj<any>[] => {
   const craftingScheme = z.tuple([ z.string(), z.string(), z.coerce.number() ])
   const equipScheme = z.tuple([ z.string(), z.string(), slotSchema, z.coerce.number().optional() ])
   const unequipScheme = z.tuple([ z.string(), slotSchema, z.coerce.number().optional() ])
+  const bankItemScheme = z.tuple([ z.string(), z.string(), z.coerce.number() ])
+  const bankGoldScheme = z.tuple([ z.string(), z.coerce.number() ])
 
   //
   // Administrative
@@ -89,6 +91,22 @@ export const buildCommands = (): CommandObj<any>[] => {
   }))
   commands.push(buildCommand(['task-complete'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
     await actions.completeTask(args[0])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['deposit'], bankItemScheme, async (args: z.infer<typeof bankItemScheme>): Promise<ProcessCommandCode> => {
+    await actions.depositBank(args[0], args[1], args[2])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['withdraw'], bankItemScheme, async (args: z.infer<typeof bankItemScheme>): Promise<ProcessCommandCode> => {
+    await actions.withdrawBank(args[0], args[1], args[2])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['deposit-gold'], bankGoldScheme, async (args: z.infer<typeof bankGoldScheme>): Promise<ProcessCommandCode> => {
+    await actions.depositBankGold(args[0], args[1])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['withdraw-gold'], bankGoldScheme, async (args: z.infer<typeof bankGoldScheme>): Promise<ProcessCommandCode> => {
+    await actions.withdrawBankGold(args[0], args[1])
     return ProcessCommandCode.Done
   }))
 
