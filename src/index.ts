@@ -8,7 +8,6 @@ import { buildCommands } from './cli/commands.js';
 const main = async () => {
   console.log('Starting up!');
 
-
   console.log("Loading characters.")
   await actions.loadCharacters()
 

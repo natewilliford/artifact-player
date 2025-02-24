@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { axiosInstance } from "../axios.js";
+import { CharacterFightDataSchema, CharacterMovementDataSchema, CharacterRestDataSchema, CharacterSchema, EquipRequestSchema, GameError, SkillDataSchema, Slot } from "./types.js";
 
 export default {
   getCharacters: async (): Promise<CharacterSchema[]> => {
@@ -19,6 +20,15 @@ export default {
   },
   gather: async (name: string): Promise<SkillDataSchema> => {
     return await doPost(`/my/${name}/action/gathering`, {}) as SkillDataSchema
+  },
+  craft: async (name: string, code: string, quantity: number): Promise<SkillDataSchema> => {
+    return await doPost(`/my/${name}/action/crafting`, { code, quantity }) as SkillDataSchema
+  },
+  equip: async (name: string, code: string, slot: Slot, quantity: number = 1): Promise<EquipRequestSchema> => {
+    return await doPost(`my/${name}/action/equip`, { code, slot, quantity }) as EquipRequestSchema
+  },
+  unequip: async (name: string, slot: Slot, quantity: number = 1): Promise<EquipRequestSchema> => {
+    return await doPost(`my/${name}/action/unequip`, { slot, quantity }) as EquipRequestSchema
   }
 }
 

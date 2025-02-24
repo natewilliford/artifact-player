@@ -1,4 +1,5 @@
 import { addSeconds } from "date-fns";
+import { CharacterSchema, CooldownSchema } from "../api/types.js";
 
 export type Pos = {
   x: number;

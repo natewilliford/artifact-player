@@ -3,6 +3,7 @@ import actions from "../actions/actions.js"
 import { runProgram } from "../agent/agent.js"
 import { characterMap } from "../gamestate/characters.js"
 import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
+import { Slot, slotSchema } from "../api/types.js"
 
 export const buildCommands = (): CommandObj<any>[] => {
   const commands: CommandObj<any>[] = []
@@ -10,6 +11,9 @@ export const buildCommands = (): CommandObj<any>[] => {
   const emptySchema = z.tuple([])
   const nameSchema = z.tuple([ z.string() ])
   const moveSchema = z.tuple([ z.string(), z.coerce.number(), z.coerce.number() ]) // name, x, y
+  const craftingScheme = z.tuple([ z.string(), z.string(), z.coerce.number() ])
+  const equipScheme = z.tuple([ z.string(), z.string(), slotSchema, z.coerce.number().optional() ])
+  const unequipScheme = z.tuple([ z.string(), slotSchema, z.coerce.number().optional() ])
 
   //
   // Administrative
@@ -50,6 +54,18 @@ export const buildCommands = (): CommandObj<any>[] => {
   }))
   commands.push(buildCommand(['gather'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
     await actions.gather(args[0])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['craft'], craftingScheme, async (args: z.infer<typeof craftingScheme>): Promise<ProcessCommandCode> => {
+    await actions.craft(args[0], args[1], args[2])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['equip'], equipScheme, async (args: z.infer<typeof equipScheme>): Promise<ProcessCommandCode> => {
+    await actions.equip(args[0], args[1], args[2], args[3])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['unequip'], unequipScheme, async (args: z.infer<typeof unequipScheme>): Promise<ProcessCommandCode> => {
+    await actions.unequip(args[0], args[1], args[2])
     return ProcessCommandCode.Done
   }))
 
