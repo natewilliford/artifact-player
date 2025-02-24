@@ -1,7 +1,4 @@
-import actions from "../actions/actions.js"
-import { runProgram } from "../agent/agent.js"
-import { characterMap } from "../gamestate/characters.js"
-import { Command, commandsMap } from "./commands.js"
+import { ZodSchema } from "zod"
 
 enum ProcessCommandCode {
   Done,
@@ -9,97 +6,57 @@ enum ProcessCommandCode {
   Quit
 }
 
-const move = async (args: string[]) => {
-  if (args.length != 3) {
-    throw new Error("Must have 3 args: name, x, y. args: " + args)
-  }
-  try {
-    const x = parseInt(args[1])
-    const y = parseInt(args[2])
-    await actions.moveCharacter(args[0], x, y)
-  } catch {
-    throw new Error("Couldn't parse x or y coord.")
-  }
+interface CommandObj<T> {
+  commandNames: string[] // Valid ways of calling. 
+  argsSchema: ZodSchema
+  commandOperation: (args: T) => Promise<ProcessCommandCode>
 }
-
-const fight = async (args: string[]) => {
-  if (args.length != 1) {
-    throw new Error("Must have 1 arg: name. args: " + args)
-  }
-  await actions.fight(args[0])
-}
-
-const rest = async (args: string[]) => {
-  if (args.length != 1) {
-    throw new Error("Must have 1 arg: name. args: " + args)
-  }
-  await actions.rest(args[0])
-}
-
-const stats = (args: string[]) => {
-  if (args.length != 1) {
-    throw new Error("Must have 1 arg: name. args: " + args)
-  }
-  actions.printStats(args[0])
-}
-
-const runProgramCmd = (args: string[]) => {
-  if (args.length != 1) {
-    throw new Error("Must have 1 arg: name. args: " + args)
-  }
-  runProgram(args[0])
-}
-
-const gather = (args: string[]) => {
-  if (args.length != 1) {
-    throw new Error("Must have 1 arg: name. args: " + args)
-  }
-  actions.gather(args[0])
-}
-
-const processCommand = async (input: string): Promise<ProcessCommandCode> => {
-  let inputParts = input.split(' ')
-  if (inputParts.length < 1) {
-    throw new Error("no command")
-  }
-  const commandString = inputParts[0]
-  const args = inputParts.slice(1)
-  if (commandString in commandsMap) {
-    const command = commandsMap[commandString]
-    switch(command) {
-      case Command.Quit: 
-        console.log("Quit command.")
-        return ProcessCommandCode.Quit
-      case Command.List:
-        characterMap.forEach((_, k) => {
-          console.log(k)
-        });
-        return ProcessCommandCode.Done
-      case Command.Move:
-        await move(args)
-        return ProcessCommandCode.Done
-      case Command.Fight:
-        await fight(args)
-        return ProcessCommandCode.Done
-      case Command.Rest:
-        await rest(args) 
-        return ProcessCommandCode.Done
-      case Command.Stats:
-        stats(args) 
-        return ProcessCommandCode.Done
-      case Command.Gather:
-        await gather(args)
-        return ProcessCommandCode.Done
-      case Command.RunProgram:
-        // Don't await so we can do other stuff.
-        runProgramCmd(args)
-        return ProcessCommandCode.Done
-      default:
-        return ProcessCommandCode.Unrecognized
+const buildCommand = <T>(names: string[], argsSchema: ZodSchema, op: (args: T) => Promise<ProcessCommandCode>): CommandObj<T> => {
+    return {
+      commandNames: names,
+      argsSchema,
+      commandOperation: op
     }
-  } else {
-    return ProcessCommandCode.Unrecognized
+}
+
+class CommandProcessor {
+  commandMap = new Map<string, CommandObj<any>>()
+
+  constructor(commands: CommandObj<any>[]) {
+    commands.forEach(c => this.addCommand(c))
+  }
+  
+  addCommand<T>(command: CommandObj<T>) {
+    command.commandNames.forEach(name => {
+      if (this.commandMap.get(name)) {
+        throw new Error("Command already exists with name: " + name)
+      }
+      this.commandMap.set(name, command)
+    })
+  }
+
+  async runCommand(input: string): Promise<ProcessCommandCode> {
+    const parts = input.split(' ').filter(p => p.length > 0)
+    const name = parts[0]
+    const args = parts.slice(1)
+    
+    const com = this.commandMap.get(name)
+    if(!com) {
+      console.warn(`No command with name: ${name}`)
+      return ProcessCommandCode.Unrecognized
+    }
+    
+    const parseResults = com.argsSchema.safeParse(args)
+    if (parseResults.success) {
+      console.log(parseResults.data)
+      return await com.commandOperation(parseResults.data)
+    } else {
+      parseResults.error.issues.forEach(iss => {
+        console.warn(`${iss.message} - arg: ${iss.path}`)
+      })
+      return ProcessCommandCode.Unrecognized
+    }
   }
 }
 
-export { processCommand, ProcessCommandCode }
+export { buildCommand, CommandObj, CommandProcessor, ProcessCommandCode }
