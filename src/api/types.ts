@@ -54,7 +54,10 @@ export type CharacterSchema = {
   // ...
   inventory: InventorySlot[];
 
-
+  task: string
+  task_type: string
+  task_progress: number
+  task_total: number
 
 }
 
@@ -126,5 +129,44 @@ export type EquipRequestSchema = {
   cooldown: CooldownSchema
   slot: string
   item: ItemSchema
+  character: CharacterSchema
+}
+
+export type TaskFullSchema = {
+  code: string
+  level: number
+  type: 'monsters' | 'items'
+  min_quantity: number
+  max_quantity: number
+  skill: any
+  rewards: RewardsSchema
+}
+
+export type RewardsSchema = {
+  items: SimpleItemSchema[]
+  gold: number
+}
+
+export type SimpleItemSchema = {
+  code: string
+  quantity: number
+}
+
+export type TaskSchema = {
+  code: string
+  type: string
+  total: number
+  rewards: RewardsSchema
+}
+
+export type TaskDataSchema = {
+  cooldown: CooldownSchema
+  task: TaskSchema
+  character: CharacterSchema
+}
+
+export type RewardDataSchema = {
+  cooldown: CooldownSchema
+  rewards: RewardsSchema
   character: CharacterSchema
 }

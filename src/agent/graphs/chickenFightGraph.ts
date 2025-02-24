@@ -8,7 +8,6 @@ type ChickenFightGraphParams = {
   character: Character
   fightLocation: Pos
   minHealth: number
-  targetLevel: number
 }
 
 export const buildChickenFightGraph = (params: ChickenFightGraphParams): Graph => {
@@ -39,7 +38,7 @@ export const buildChickenFightGraph = (params: ChickenFightGraphParams): Graph =
   g.addEdge("move", "fight", atPositionTrigger(c, params.fightLocation))
   g.addEdge("fight", "heal", lowHealthTrigger(c, params.minHealth))
   g.addEdge("heal", "fight", fullHealthTrigger(c))
-  g.addEdge("fight", "end", reachedLevelTrigger(c, 2))
+  // g.addEdge("fight", "end", reachedLevelTrigger(c, 2))
 
   return g
 }

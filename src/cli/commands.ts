@@ -7,6 +7,7 @@ import { slotSchema } from "../api/types.js"
 import { Character } from "../gamestate/character.js"
 import { characterMap, characters } from "../gamestate/characters.js"
 import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
+import { buildFishingGraph } from "../agent/graphs/fishingGraph.js"
 
 export const buildCommands = (): CommandObj<any>[] => {
   const commands: CommandObj<any>[] = []
@@ -25,6 +26,10 @@ export const buildCommands = (): CommandObj<any>[] => {
   commands.push(buildCommand(['exit', 'quit', 'q'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
     return ProcessCommandCode.Quit
   }))
+  commands.push(buildCommand(['load'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
+    await actions.loadCharacters()
+    return ProcessCommandCode.Done
+  }))
 
   //
   // Status
@@ -36,6 +41,14 @@ export const buildCommands = (): CommandObj<any>[] => {
   }))
   commands.push(buildCommand(['stats'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
     actions.printStats(args[0])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['tasks'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
+    await actions.getTasks()
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['task-status'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+    actions.printTaskStatus(args[0])
     return ProcessCommandCode.Done
   }))
 
@@ -71,6 +84,14 @@ export const buildCommands = (): CommandObj<any>[] => {
     await actions.unequip(args[0], args[1], args[2])
     return ProcessCommandCode.Done
   }))
+  commands.push(buildCommand(['task-accept'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+    await actions.acceptTask(args[0])
+    return ProcessCommandCode.Done
+  }))
+  commands.push(buildCommand(['task-complete'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+    await actions.completeTask(args[0])
+    return ProcessCommandCode.Done
+  }))
 
   //
   // Macros
@@ -89,7 +110,7 @@ export const buildCommands = (): CommandObj<any>[] => {
         y: 1
       },
       minHealth: 0.5,
-      targetLevel: 2
+      // targetLevel: 2
     })
   
     // Don't await so we can run other commands in the mean time.
@@ -112,6 +133,12 @@ export const buildCommands = (): CommandObj<any>[] => {
   
     // Don't await so we can run other commands in the mean time.
     runGraph(graph)
+    return ProcessCommandCode.Done
+  }))
+
+  commands.push(buildCommand(['run-fishing'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+    // Don't await so we can run other commands in the mean time.
+    runGraph(buildFishingGraph(args[0]))
     return ProcessCommandCode.Done
   }))
 
