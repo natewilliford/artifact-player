@@ -183,6 +183,15 @@ export default {
     }
     return res.error
   },
+  useItem: async (name: string, code: string, quantity: number) => {
+    const character = characters.getCharacter(name)
+    const res = await api.useItem(name, code, quantity)
+    if (res.data) {
+      character.updateCharacter(res.data.character)
+      console.log(`${character.getName()} used item ${quantity}x ${res.data.item.code}`)
+    }
+    return res.error
+  },
 }
 
 const logRewards = (rewards: RewardsSchema) => {

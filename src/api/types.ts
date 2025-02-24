@@ -189,3 +189,9 @@ export type BankGoldTransactionSchema = {
   bank: GoldSchema
   character: CharacterSchema
 }
+
+export type UseItemSchema = {
+  cooldown: CooldownSchema
+  item: ItemSchema
+  character: CharacterSchema
+}
