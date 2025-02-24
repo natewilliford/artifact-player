@@ -78,7 +78,8 @@ export default {
     const character = characters.getCharacter(name)
     const res = await api.craft(character.getName(), code, quantity)
     if (res.data) {
-    console.log(`${character.getName()} crafted and gained ${res.data.details.xp}xp and items:`)
+      character.updateCharacter(res.data.character)
+      console.log(`${character.getName()} crafted and gained ${res.data.details.xp}xp and items:`)
       res.data.details.items.forEach(i => {
         console.log(`  ${i.quantity}x - ${i.code}`)
       })
