@@ -32,15 +32,17 @@ export type CharacterSchema = {
   account: string;
   skin: string;
   level: number;
-  xp: number;
-  max_xp: number; // xp needed to level up.
-  gold: number;
+  xp: number
+  max_xp: number // xp needed to level up.
+  gold: number
   // ...
-  hp: number;
-  max_hp: number;
+  hp: number
+  max_hp: number
   // ... 
-  x: number;
-  y: number;
+  x: number
+  y: number
+  cooldown: number // seconds remaining.
+  cooldown_expiration: string // date
   // ...
   weapon_slot: string
   rune_slot: string

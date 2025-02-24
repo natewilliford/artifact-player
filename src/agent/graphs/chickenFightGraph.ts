@@ -31,7 +31,7 @@ export const buildChickenFightGraph = (params: ChickenFightGraphParams): Graph =
   addCooldownNode(g, "heal", c)
 
   // 4. End 
-  g.addNode(buildNode("end", async () => {}))
+  g.addNode(buildNode("end", noop))
   
   // Edges
   g.addEdge("start", "move", alwaysTrigger)

@@ -1,5 +1,5 @@
 import { addSeconds } from "date-fns";
-import { CharacterSchema, CooldownSchema } from "../api/types.js";
+import { CharacterSchema } from "../api/types.js";
 
 export type Pos = {
   x: number;
@@ -8,25 +8,20 @@ export type Pos = {
 
 export class Character {
   characterSchema: CharacterSchema
-  currentCooldown: CooldownSchema | undefined
-  localCooldownStart: Date | undefined
+  lastUpdated: Date
 
   constructor(characterSchema: CharacterSchema) {
     this.characterSchema = characterSchema
+    this.lastUpdated = new Date()
   }
 
-  updateCharacter(characterSchema: CharacterSchema, currentCooldown: CooldownSchema) {
+  updateCharacter(characterSchema: CharacterSchema) {
     this.characterSchema = characterSchema
-    this.currentCooldown = currentCooldown
-    this.localCooldownStart = new Date()
+    this.lastUpdated = new Date()
   }
 
   getCoolDownExpiration(): Date {
-    if (!this.localCooldownStart || !this.currentCooldown) {
-      return new Date()
-    }
-
-    return addSeconds(this.localCooldownStart, this.currentCooldown.total_seconds)
+    return addSeconds(this.lastUpdated, this.characterSchema.cooldown)
   }
 
   getCooldownSecondsRemaining(): number {

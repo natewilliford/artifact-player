@@ -1,6 +1,5 @@
 import { z } from "zod"
 import actions from "../actions/actions.js"
-import { runGraph } from "../agent/agent.js"
 import { buildChickenFightGraph } from "../agent/graphs/chickenFightGraph.js"
 import { buildGatherWoodGraph } from "../agent/graphs/collectWoodGraph.js"
 import { slotSchema } from "../api/types.js"
@@ -114,7 +113,7 @@ export const buildCommands = (): CommandObj<any>[] => {
     })
   
     // Don't await so we can run other commands in the mean time.
-    runGraph(graph)
+    graph.runGraph()
     return ProcessCommandCode.Done
   }))
 
@@ -132,13 +131,14 @@ export const buildCommands = (): CommandObj<any>[] => {
     })
   
     // Don't await so we can run other commands in the mean time.
-    runGraph(graph)
+    graph.runGraph()
     return ProcessCommandCode.Done
   }))
 
   commands.push(buildCommand(['run-fishing'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+    const graph = buildFishingGraph(args[0])
     // Don't await so we can run other commands in the mean time.
-    runGraph(buildFishingGraph(args[0]))
+    graph.runGraph()
     return ProcessCommandCode.Done
   }))
 

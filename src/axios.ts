@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: 'https://api.artifactsmmo.com',
-  timeout: 1000,
+  timeout: 5000,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',

@@ -1,10 +1,16 @@
+import { CharacterSchema } from "../api/types.js";
 import { Character } from "./character.js";
 
 const characterMap = new Map<string, Character>();
 
 const characters = {
-  addCharacter: (c: Character) => {
-    characterMap.set(c.getName(), c)
+  addOrUpdate: (cs: CharacterSchema) => {
+    const existing = characterMap.get(cs.name)
+    if (existing) {
+      existing.updateCharacter(cs)
+    } else {
+      characterMap.set(cs.name, new Character(cs))
+    }
   },
   getCharacter: (name: string) => {
     const character = characterMap.get(name)
@@ -15,4 +21,4 @@ const characters = {
   }
 }
 
-export { characterMap, characters }
+export { characterMap, characters };
