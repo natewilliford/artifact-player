@@ -1,9 +1,12 @@
 import { z } from "zod"
 import actions from "../actions/actions.js"
-import { runProgram } from "../agent/agent.js"
-import { characterMap } from "../gamestate/characters.js"
+import { runGraph } from "../agent/agent.js"
+import { buildChickenFightGraph } from "../agent/graphs/chickenFightGraph.js"
+import { buildGatherWoodGraph } from "../agent/graphs/collectWoodGraph.js"
+import { slotSchema } from "../api/types.js"
+import { Character } from "../gamestate/character.js"
+import { characterMap, characters } from "../gamestate/characters.js"
 import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
-import { Slot, slotSchema } from "../api/types.js"
 
 export const buildCommands = (): CommandObj<any>[] => {
   const commands: CommandObj<any>[] = []
@@ -73,9 +76,42 @@ export const buildCommands = (): CommandObj<any>[] => {
   // Macros
   //
 
-  commands.push(buildCommand(['run-program'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+  commands.push(buildCommand(['run-chicken-fight'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+    const c: Character = characters.getCharacter(args[0])
+    if (!c) {
+      throw new Error("Character not found.")
+    }
+  
+    const graph = buildChickenFightGraph({
+      character: c,
+      fightLocation: {
+        x: 0,
+        y: 1
+      },
+      minHealth: 0.5,
+      targetLevel: 2
+    })
+  
     // Don't await so we can run other commands in the mean time.
-    runProgram(args[0])
+    runGraph(graph)
+    return ProcessCommandCode.Done
+  }))
+
+  commands.push(buildCommand(['run-gather-wood'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+    const c: Character = characters.getCharacter(args[0])
+    if (!c) {
+      throw new Error("Character not found.")
+    }
+  
+    const graph = buildGatherWoodGraph({
+      character: c,
+      gatherLocation: { x: -1, y: 0 },
+      gatherAmount: 10,
+      gatherItemCode: "ash_wood"
+    })
+  
+    // Don't await so we can run other commands in the mean time.
+    runGraph(graph)
     return ProcessCommandCode.Done
   }))
 

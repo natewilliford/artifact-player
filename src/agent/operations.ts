@@ -30,3 +30,9 @@ export const restOperation = (c: Character): Operation => {
     await actions.rest(c.getName())
   }
 }
+
+export const gatherOperation = (c: Character): Operation => {
+  return async() => {
+    await actions.gather(c.getName())
+  }
+}

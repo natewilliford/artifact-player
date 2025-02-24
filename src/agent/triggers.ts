@@ -47,3 +47,13 @@ export const hasCooldownTrigger = (c: Character): Trigger => {
 export const cooldownDoneTrigger = (c: Character): Trigger => {
   return () => c.getCooldownSecondsRemaining() === 0
 }
+
+export const hasItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
+  return () => {
+    const itemCount = c.characterSchema.inventory
+      .filter(slot => slot.code === code)
+      .reduce((sum, slot) => sum + slot.quantity, 0)
+    console.log(`Item count: ${code} - ${itemCount}`)
+    return itemCount >= quantity
+  }
+}

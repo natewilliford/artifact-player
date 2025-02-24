@@ -1,29 +1,7 @@
 
-import { Character } from "../gamestate/character.js"
-import { characters } from "../gamestate/characters.js"
-import { Graph, Node } from "./decisiongraph/graph.js"
-import { buildChickenFightGraph } from "./graphs/chickenFightGraph.js"
+import { Graph } from "./decisiongraph/graph.js"
 
-const runProgram = async (name: string) => {
-  const c: Character = characters.getCharacter(name)
-  if (!c) {
-    throw new Error("Character not found.")
-  }
-
-  const graph = buildChickenFightGraph({
-    character: c,
-    fightLocation: {
-      x: 0,
-      y: 1
-    },
-    minHealth: 0.5,
-    targetLevel: 2
-  })
-
-  await runGraph(graph)
-}
-
-const runGraph = async (graph: Graph) => {
+export const runGraph = async (graph: Graph) => {
   let running = true
   let node = graph.startingNode
   while(running) {  
@@ -68,5 +46,3 @@ const runGraph = async (graph: Graph) => {
     console.log("Operation done")
   }
 }
-
-export { runProgram }
