@@ -1,11 +1,11 @@
 import { z } from "zod"
 import actions from "../actions/actions.js"
-import { buildChickenFightGraph } from "../agent/graphs/chickenFightGraph.js"
-import { buildGatherWoodGraph } from "../agent/graphs/collectWoodGraph.js"
+import { buildChickenFightGraph } from "../behavior/graphs/chickenFightGraph.js"
+import { buildGatherWoodGraph } from "../behavior/graphs/collectWoodGraph.js"
 import { slotSchema } from "../api/types.js"
 import { Character } from "../gamestate/character.js"
 import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
-import { buildFishingGraph } from "../agent/graphs/fishingGraph.js"
+import { buildFishingGraph } from "../behavior/graphs/fishingGraph.js"
 import { localState } from "../gamestate/localstate.js"
 
 export const buildCommands = (): CommandObj<any>[] => {
