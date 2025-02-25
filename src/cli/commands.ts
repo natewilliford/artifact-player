@@ -7,8 +7,9 @@ import { Character } from "../gamestate/character.js"
 import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
 import { buildFishingGraph } from "../behavior/graphs/fishingGraph.js"
 import { localState } from "../gamestate/localstate.js"
+import { BehaviorRunner } from "../behavior/behaviorRunner.js"
 
-export const buildCommands = (): CommandObj<any>[] => {
+export const buildCommands = (behaviorRunner: BehaviorRunner): CommandObj<any>[] => {
   const commands: CommandObj<any>[] = []
 
   const emptySchema = z.tuple([])
@@ -18,6 +19,7 @@ export const buildCommands = (): CommandObj<any>[] => {
   const unequipScheme = z.tuple([ z.string(), slotSchema, z.coerce.number().optional() ])
   const itemQuantitySchema = z.tuple([ z.string(), z.string(), z.coerce.number() ])
   const bankGoldScheme = z.tuple([ z.string(), z.coerce.number() ])
+  const runBehaviorSchema = z.tuple([ z.string(), z.string() ])
 
   //
   // Administrative
@@ -108,45 +110,33 @@ export const buildCommands = (): CommandObj<any>[] => {
     return ProcessCommandCode.Done
   }))
 
-  //
-  // Macros
-  //
-
-  commands.push(buildCommand(['run-chicken-fight'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+  commands.push(buildCommand(['run'], runBehaviorSchema, async (args: z.infer<typeof runBehaviorSchema>): Promise<ProcessCommandCode> => {
     const c: Character = localState.getCharacter(args[0])
     if (!c) {
       throw new Error("Character not found.")
     }
-  
-    const graph = buildChickenFightGraph(c)
-  
-    // Don't await so we can run other commands in the mean time.
-    graph.runGraph()
+
+    behaviorRunner.runBehavior(c, args[1])
     return ProcessCommandCode.Done
   }))
 
-  commands.push(buildCommand(['run-gather-wood'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
+  commands.push(buildCommand(['stop'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
     const c: Character = localState.getCharacter(args[0])
     if (!c) {
       throw new Error("Character not found.")
     }
-  
-    const graph = buildGatherWoodGraph({
-      character: c,
-      gatherLocation: { x: -1, y: 0 },
-      gatherAmount: 10,
-      gatherItemCode: "ash_wood"
-    })
-  
-    // Don't await so we can run other commands in the mean time.
-    graph.runGraph()
+
+    behaviorRunner.stopBehavior(c.getName())
     return ProcessCommandCode.Done
   }))
 
-  commands.push(buildCommand(['run-fishing'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
-    const graph = buildFishingGraph(args[0])
-    // Don't await so we can run other commands in the mean time.
-    graph.runGraph()
+  commands.push(buildCommand(['list-behaviors', 'lb'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
+    behaviorRunner.listBehaviors()
+    return ProcessCommandCode.Done
+  }))
+
+  commands.push(buildCommand(['running-behaviors', 'rb'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
+    behaviorRunner.listRunningBehaviors()
     return ProcessCommandCode.Done
   }))
 

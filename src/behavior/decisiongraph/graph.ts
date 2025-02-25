@@ -35,6 +35,10 @@ class Graph {
     node: string
   }
   
+  running = false
+  runningPromise?: Promise<void>
+  onEndCallback?: () => void
+
   addNode(n: Node) {
     if (this.nodes.get(n.id)) {
       throw new Error("Graph already contains node with id: " + n.id)
@@ -66,10 +70,15 @@ class Graph {
     return await actions.load()
   }
 
-  async runGraph() {
-    let running = true
+  // Returns imediately, but graph runs async.
+  runGraph() {
+    this.running = true
+    this.runningPromise = this.doRunGraph()  
+  }
+
+  async doRunGraph() {
     let node = this.startingNode
-    while(running) {  
+    while(this.running) {  
       if (!node) {
         console.warn(`Null node.`)
         break
@@ -79,7 +88,7 @@ class Graph {
         const newError = await this.resolveError()
         if (newError) {
           console.log("Couldn't resolve error. Killing graph.")
-          running = false
+          this.running = false
         } else {
           this.operationError = undefined
         }
@@ -89,7 +98,7 @@ class Graph {
       console.log("Current node: " + node.id)
       if (node.id === "end") {
         console.log("We are at the end node.")
-        running = false
+        this.running = false
         continue
       }
 
@@ -97,7 +106,7 @@ class Graph {
       const edges = this.edges.get(node.id)
       if (!edges || edges.length === 0) {
         console.warn(`Node ${node.id} has no edges. Finishing.`)
-        running = false
+        this.running = false
         continue
       }
       // Reset the loop (can't just call continue in the inner for loop).
@@ -109,7 +118,7 @@ class Graph {
           node = this.nodes.get(e.toNodeId)
           if (!node) {
             console.warn(`Null node with id ${e.toNodeId}`)
-            running = false
+            this.running = false
             break
           }
           shouldContinue = true
@@ -131,6 +140,21 @@ class Graph {
         }
       }
     }
+    if (this.onEndCallback) {
+      this.onEndCallback()
+    }
+  }
+
+  async stop(): Promise<void> {
+    this.running = false
+    if (this.runningPromise) {
+      await this.runningPromise
+    }
+    return
+  }
+
+  setOnEnd(callback: () => void) {
+    this.onEndCallback = callback
   }
 }
 

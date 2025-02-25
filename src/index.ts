@@ -4,6 +4,8 @@ import * as readline from 'node:readline/promises';
 import actions from './actions/actions.js';
 import { CommandProcessor, ProcessCommandCode } from './cli/commandProcessor.js';
 import { buildCommands } from './cli/commands.js';
+import { BehaviorRunner } from './behavior/behaviorRunner.js';
+import { buildBehaviors } from './behavior/behaviors.js';
 
 const main = async () => {
   console.log('Starting up!');
@@ -11,7 +13,8 @@ const main = async () => {
   console.log("Loading characters.")
   await actions.load()
 
-  const commandProcessor = new CommandProcessor(buildCommands())
+  const behaviorRunner = new BehaviorRunner(buildBehaviors())
+  const commandProcessor = new CommandProcessor(buildCommands(behaviorRunner))
   const rl = readline.createInterface({ input, output })
   let quitting = false
   try {

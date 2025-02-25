@@ -48,7 +48,6 @@ class CommandProcessor {
     
     const parseResults = com.argsSchema.safeParse(args)
     if (parseResults.success) {
-      console.log(parseResults.data)
       try {
         return await com.commandOperation(parseResults.data)
       } catch (err) {
