@@ -162,10 +162,9 @@ export default {
     const character = localState.getCharacter(name)
     const cs = character.characterSchema
     if (cs.task && cs.task.length > 0) {
-      console.log(`Task: ${cs.task} - type: ${cs.task_type}`)
-      console.log(`progress: ${cs.task_progress}/${cs.task_total}`)
+      console.log(`${name}: ${cs.task} - type: ${cs.task_type} - progress: ${cs.task_progress}/${cs.task_total}`)
     } else {
-      console.log('No task in progress')
+      console.log(`${name}: no task`)
     }
   },
   depositBank: async (name: string, code: string, quantity: number) => {

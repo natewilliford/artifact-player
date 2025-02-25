@@ -49,8 +49,8 @@ export const buildCommands = (behaviorRunner: BehaviorRunner): CommandObj<any>[]
     await actions.getTasks()
     return ProcessCommandCode.Done
   }))
-  commands.push(buildCommand(['task-status'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
-    actions.printTaskStatus(args[0])
+  commands.push(buildCommand(['task-status', 'ts'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
+    localState.getCharacters().forEach(c => actions.printTaskStatus(c.getName()))
     return ProcessCommandCode.Done
   }))
 
