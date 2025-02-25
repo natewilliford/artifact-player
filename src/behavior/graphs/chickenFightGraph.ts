@@ -5,7 +5,7 @@ import { alwaysTrigger, atPositionTrigger, bankHasItemsTrigger, bankHasLessThanI
 import { addCooldownNode } from "./helpers.js";
 
 export const buildChickenFightGraph = (c: Character): Graph => {
-  const g = new Graph()
+  const g = new Graph(c)
 
   const fightLocation = {x: 0, y: 1}
   const bank = { x: 4, y: 1 }

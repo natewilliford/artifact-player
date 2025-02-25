@@ -14,7 +14,6 @@ export const moveOperation = (c: Character, pos: Pos): Operation => {
 export const cooldownOperation = (c: Character): Operation => {
   return async () => {
     const secondsRemaining = c.getCooldownSecondsRemaining()
-    console.log(`Waiting for cooldown: ${secondsRemaining}s`)
     await delay(secondsRemaining * 1000 + 100) // Add a few millis to make sure.
     return null
   }

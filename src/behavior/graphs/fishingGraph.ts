@@ -5,7 +5,7 @@ import { alwaysTrigger, atPositionTrigger, hasItemsTrigger, hasLessThanItemsTrig
 import { addCooldownNode } from "./helpers.js"
 
 export const buildFishingGraph = (c: Character): Graph => {  
-  const g = new Graph()
+  const g = new Graph(c)
 
   const fishingLoc: Pos = {x: 4, y: 2}
   const cookingWorkshop: Pos = { x: 1, y: 1 }

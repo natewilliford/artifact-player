@@ -4,7 +4,6 @@ import { Trigger } from "./decisiongraph/graph.js"
 
 export const alwaysTrigger: Trigger = () => true
 
-
 export const healthPercentTrigger = (c: Character, healthAmount: number): Trigger => {
   return (): boolean => 
     (c.characterSchema.hp / c.characterSchema.max_hp) < healthAmount
@@ -23,11 +22,7 @@ export const reachedLevelTrigger = (c: Character, level: number): Trigger => {
 }
 
 export const atPositionTrigger = (c: Character, pos: Pos): Trigger => {
-  return () => {
-    const isThere = c.getPosition().x === pos.x && c.getPosition().y === pos.y
-    console.log(`At position? ${isThere}`)
-    return isThere
-  }
+  return () => c.getPosition().x === pos.x && c.getPosition().y === pos.y
 }
 
 export const hasCooldownTrigger = (c: Character): Trigger => {
@@ -39,19 +34,11 @@ export const cooldownDoneTrigger = (c: Character): Trigger => {
 }
 
 export const hasItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
-  return () => {
-    const itemCount = c.getItemCount(code)
-    console.log(`Item count: ${code} - ${itemCount}`)
-    return itemCount >= quantity
-  }
+  return () => c.getItemCount(code) >= quantity
 }
 
 export const hasLessThanItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
-  return () => {
-    const itemCount = c.getItemCount(code)
-    console.log(`Item count: ${code} - ${itemCount}`)
-    return itemCount < quantity
-  }
+  return () => c.getItemCount(code) < quantity
 }
 
 export const bankHasItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
@@ -61,10 +48,7 @@ export const bankHasItemsTrigger = (c: Character, code: string, quantity: number
       console.warn("Couldn't get bank local state.")
       return false
     }
-
-    const itemCount = bank.getItemCount(code)
-    console.log(`Item count: ${code} - ${itemCount}`)
-    return itemCount >= quantity
+    return bank.getItemCount(code) >= quantity
   }
 }
 
@@ -75,9 +59,6 @@ export const bankHasLessThanItems = (c: Character, code: string, quantity: numbe
       console.warn("Couldn't get bank local state.")
       return false
     }
-
-    const itemCount = bank.getItemCount(code)
-    console.log(`Item count: ${code} - ${itemCount}`)
-    return itemCount < quantity
+    return bank.getItemCount(code) < quantity
   }
 }

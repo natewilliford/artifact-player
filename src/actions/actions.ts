@@ -40,7 +40,7 @@ export default {
     if (res.data) {
       character.updateCharacter(res.data.character);
       const newPos = character.getPosition()
-      console.log(character.getName() + " moved to " + newPos.x + ", " + newPos.y + " - " +  res.data.destination.name);
+      console.log(`${character.getName()} moved to ${newPos.x}, ${newPos.y} - ${res.data.destination.name}`);
       character.getCoolDownExpiration()
     }
     return res.error
@@ -50,7 +50,7 @@ export default {
     const res = await api.fight(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log("Fight result: " + res.data.fight.result + " - " + res.data.fight.logs[0]);
+      console.log(`${character.getName()} fight result: ${res.data.fight.result} - ${res.data.fight.logs[0]}`);
     }
     return res.error
   },
@@ -59,7 +59,7 @@ export default {
     const res = await api.rest(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} rested and restored ${res.data.hp_restored} hp.`)
+      console.log(`${character.getName()} rested and restored ${res.data.hp_restored}hp.`)
     }
     return res.error
   },

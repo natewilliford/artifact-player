@@ -14,7 +14,7 @@ type CollectWoodGraphParams = {
 
 export const buildGatherWoodGraph = (params: CollectWoodGraphParams): Graph => {
   const c = params.character
-  const g = new Graph()
+  const g = new Graph(c)
 
   // Nodes
   g.startingNode = buildNode("start",  noop)

@@ -1,4 +1,5 @@
 import actions from "../../actions/actions.js"
+import { Character } from "../../gamestate/character.js"
 
 type Trigger = () => boolean
 type Operation = () => Promise<Maybe<Error>>
@@ -35,9 +36,15 @@ class Graph {
     node: string
   }
   
+  // Character for logging. Ops should have their own ref.
+  character: Character
   running = false
   runningPromise?: Promise<void>
   onEndCallback?: () => void
+
+  constructor(c: Character) {
+    this.character = c
+  }
 
   addNode(n: Node) {
     if (this.nodes.get(n.id)) {
@@ -95,14 +102,11 @@ class Graph {
         continue
       }
 
-      console.log("Current node: " + node.id)
       if (node.id === "end") {
-        console.log("We are at the end node.")
         this.running = false
         continue
       }
 
-      console.log("Checking triggers.")
       const edges = this.edges.get(node.id)
       if (!edges || edges.length === 0) {
         console.warn(`Node ${node.id} has no edges. Finishing.`)
@@ -114,7 +118,7 @@ class Graph {
       for (let i = 0; i < edges.length; i++) {
         let e = edges[i]
         if (e.shouldTrigger()) {
-          console.log(`Triggered edge from ${e.fromNodeId} to ${e.toNodeId}`)
+          console.log(`${this.character.getName()}: ${e.fromNodeId} -> ${e.toNodeId}`)
           node = this.nodes.get(e.toNodeId)
           if (!node) {
             console.warn(`Null node with id ${e.toNodeId}`)
@@ -128,15 +132,12 @@ class Graph {
       if (shouldContinue) continue
 
       if (node) {
-        console.log(`Doing operation for node ${node.id}`)
         const opError = await node.doOperation()
         if (opError) {
           this.operationError = {
             error: opError,
             node: node.id
           }
-        } else {
-          console.log("Operation done")
         }
       }
     }
