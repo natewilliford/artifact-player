@@ -2,6 +2,7 @@ import { Character } from "../gamestate/character.js"
 import { Graph } from "./decisiongraph/graph.js"
 import { buildChickenFightGraph } from "./graphs/chickenFightGraph.js"
 import { buildGatherWoodGraph } from "./graphs/collectWoodGraph.js"
+import { buildFishingGraph } from "./graphs/fishingGraph.js"
 
 export type BehaviorObj = {
   name: string
@@ -18,7 +19,7 @@ export const buildBehaviors = (): BehaviorObj[] => {
 
   behaviors.push({
     name: "fishing",
-    buildGraph: (c: Character) => buildChickenFightGraph(c)
+    buildGraph: (c: Character) => buildFishingGraph(c)
   })
 
   behaviors.push({

@@ -158,4 +158,4 @@ class Graph {
   }
 }
 
-export { Trigger, Operation, Node, buildNode, Graph }
+export { buildNode, Graph, Node, Operation, Trigger }

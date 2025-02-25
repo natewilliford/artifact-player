@@ -1,13 +1,10 @@
-import { Pos } from "../../gamestate/character.js"
-import { localState } from "../../gamestate/localstate.js"
+import { Character, Pos } from "../../gamestate/character.js"
 import { buildNode, Graph } from "../decisiongraph/graph.js"
 import { craftOperation, depositOperation, gatherOperation, moveOperation, noop } from "../operations.js"
 import { alwaysTrigger, atPositionTrigger, hasItemsTrigger, hasLessThanItemsTrigger } from "../triggers.js"
 import { addCooldownNode } from "./helpers.js"
 
-export const buildFishingGraph = (name: string): Graph => {
-  const c = localState.getCharacter(name)
-  
+export const buildFishingGraph = (c: Character): Graph => {  
   const g = new Graph()
 
   const fishingLoc: Pos = {x: 4, y: 2}

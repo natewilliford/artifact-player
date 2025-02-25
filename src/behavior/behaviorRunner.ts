@@ -54,10 +54,15 @@ export class BehaviorRunner {
     if (runningBehavior) {
       console.log(`Stopping graph for ${characterName}. Might take a minute to end.`)
       runningBehavior.graph.stop()
-      this.runningBehaviors.delete(characterName)
     } else {
       console.log(`No running behavior for ${characterName}`)
     }
+  }
+
+  stopAllBehaviors() {
+    this.runningBehaviors.forEach((_, k) => {
+      this.stopBehavior(k)
+    })
   }
 
   listBehaviors() {

@@ -2,10 +2,10 @@ import 'dotenv/config';
 import { stdin as input, stdout as output } from 'node:process';
 import * as readline from 'node:readline/promises';
 import actions from './actions/actions.js';
-import { CommandProcessor, ProcessCommandCode } from './cli/commandProcessor.js';
-import { buildCommands } from './cli/commands.js';
 import { BehaviorRunner } from './behavior/behaviorRunner.js';
 import { buildBehaviors } from './behavior/behaviors.js';
+import { CommandProcessor, ProcessCommandCode } from './cli/commandProcessor.js';
+import { buildCommands } from './cli/commands.js';
 
 const main = async () => {
   console.log('Starting up!');

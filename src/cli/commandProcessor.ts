@@ -54,7 +54,6 @@ class CommandProcessor {
         console.warn(err)
         return ProcessCommandCode.Done
       }
-
     } else {
       parseResults.error.issues.forEach(iss => {
         console.warn(`${iss.message} - arg: ${iss.path}`)

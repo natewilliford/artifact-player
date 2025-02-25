@@ -1,13 +1,10 @@
 import { z } from "zod"
 import actions from "../actions/actions.js"
-import { buildChickenFightGraph } from "../behavior/graphs/chickenFightGraph.js"
-import { buildGatherWoodGraph } from "../behavior/graphs/collectWoodGraph.js"
 import { slotSchema } from "../api/types.js"
-import { Character } from "../gamestate/character.js"
-import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
-import { buildFishingGraph } from "../behavior/graphs/fishingGraph.js"
-import { localState } from "../gamestate/localstate.js"
 import { BehaviorRunner } from "../behavior/behaviorRunner.js"
+import { Character } from "../gamestate/character.js"
+import { localState } from "../gamestate/localstate.js"
+import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
 
 export const buildCommands = (behaviorRunner: BehaviorRunner): CommandObj<any>[] => {
   const commands: CommandObj<any>[] = []
@@ -26,14 +23,22 @@ export const buildCommands = (behaviorRunner: BehaviorRunner): CommandObj<any>[]
   //
 
   commands.push(buildCommand(['exit', 'quit', 'q'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
+    behaviorRunner.stopAllBehaviors()
     return ProcessCommandCode.Quit
   }))
   commands.push(buildCommand(['load'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
     await actions.load()
     return ProcessCommandCode.Done
   }))
-  commands.push(buildCommand(['list'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
-    localState.getCharacters().forEach((_, k) => console.log(k));
+  commands.push(buildCommand(['list', 'ls'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
+    localState.getCharacters().forEach((c, name) => {
+      const b = behaviorRunner.runningBehaviors.get(name)
+      if (b) {
+        console.log(`${name} - ${b.behavior.name} - ${b.graph.running ? 'running' : 'ending'}`)
+      } else {
+        console.log(name)
+      }  
+    });
     return ProcessCommandCode.Done
   }))
   commands.push(buildCommand(['stats'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
@@ -132,11 +137,6 @@ export const buildCommands = (behaviorRunner: BehaviorRunner): CommandObj<any>[]
 
   commands.push(buildCommand(['list-behaviors', 'lb'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
     behaviorRunner.listBehaviors()
-    return ProcessCommandCode.Done
-  }))
-
-  commands.push(buildCommand(['running-behaviors', 'rb'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
-    behaviorRunner.listRunningBehaviors()
     return ProcessCommandCode.Done
   }))
 
