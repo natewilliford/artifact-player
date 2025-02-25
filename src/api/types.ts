@@ -173,6 +173,13 @@ export type RewardDataSchema = {
   character: CharacterSchema
 }
 
+export type BankSchema = {
+  slots: number
+  expansions: number
+  next_expansion_cost: number
+  gold: number
+}
+
 export type BankItemTransactionSchema = {
   cooldown: CooldownSchema
   item: ItemSchema
@@ -195,3 +202,4 @@ export type UseItemSchema = {
   item: ItemSchema
   character: CharacterSchema
 }
+

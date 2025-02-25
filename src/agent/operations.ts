@@ -20,6 +20,14 @@ export const cooldownOperation = (c: Character): Operation => {
   }
 }
 
+export const waitOperation = (seconds: number): Operation => {
+  return async () => {
+    console.log(`Waiting ${seconds}s`)
+    await delay(seconds * 1000)
+    return null
+  }
+}
+
 export const fightOperation = (c: Character): Operation => {
   return async () => {
     return await actions.fight(c.getName())
@@ -37,3 +45,28 @@ export const gatherOperation = (c: Character): Operation => {
     return await actions.gather(c.getName())
   }
 }
+
+export const craftOperation = (c: Character, code: string, quantity: number): Operation => {
+  return async() => {
+    return await actions.craft(c.getName(), code, quantity)
+  }
+}
+
+export const depositOperation = (c: Character, code: string, quantity: number): Operation => {
+  return async() => {
+    return await actions.depositBank(c.getName(), code, quantity)
+  }
+}
+
+export const withdrawOperation = (c: Character, code: string, quantity: number): Operation => {
+  return async() => {
+    return await actions.withdrawBank(c.getName(), code, quantity)
+  }
+}
+
+export const useItemOperation = (c: Character, code: string, quantity: number): Operation => {
+  return async() => {
+    return await actions.useItem(c.getName(), code, quantity)
+  }
+}
+

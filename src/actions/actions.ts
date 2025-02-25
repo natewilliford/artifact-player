@@ -1,20 +1,41 @@
 import api from "../api/api.js";
 import { RewardsSchema, Slot } from "../api/types.js";
-import { characters } from "../gamestate/characters.js";
+import { localState } from "../gamestate/localstate.js";
 
 export default {
-  loadCharacters: async (): Promise<Maybe<Error>> => {
-    const res = await api.getCharacters()
-    if (res.data) {
-      res.data.forEach(cs => {
+  load: async (): Promise<Maybe<Error>> => {
+    const getCharactersPromise = api.getCharacters()
+    const getBankItemsPromise = api.getBankItems()
+    const getBankDetailsPromise = api.getBankDetails()
+
+    const charactersRes = await getCharactersPromise
+    if (charactersRes.data) {
+      charactersRes.data.forEach(cs => {
         console.log("Loaded character: " + cs.name)
-        characters.addOrUpdate(cs)
+        localState.addOrUpdateCharacter(cs)
       })
+    } else {
+      return charactersRes.error
     }
-    return res.error
+
+    const bankItemsRes = await getBankItemsPromise
+    if (bankItemsRes.data) {
+      console.log("Loaded bank items.")
+      localState.createOrUpdateBank(bankItemsRes.data)
+    } else {
+      return bankItemsRes.error
+    }
+
+    const bankRes = await getBankDetailsPromise
+    if (bankRes.data) {
+      console.log("Loaded bank details.")
+      localState.getBank()?.updateGold(bankRes.data.gold)
+    } else {
+      return bankRes.error
+    }
   },
   moveCharacter: async (characterName: string, x: number, y: number): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(characterName)
+    const character = localState.getCharacter(characterName)
     const res = await api.moveCharacter(character.getName(), x, y)
     if (res.data) {
       character.updateCharacter(res.data.character);
@@ -25,7 +46,7 @@ export default {
     return res.error
   },
   fight: async (characterName: string): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(characterName)
+    const character = localState.getCharacter(characterName)
     const res = await api.fight(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -34,7 +55,7 @@ export default {
     return res.error
   },
   rest: async (characterName: string): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(characterName)
+    const character = localState.getCharacter(characterName)
     const res = await api.rest(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -43,7 +64,7 @@ export default {
     return res.error
   },
   printStats: (characterName: string) => {
-    const character = characters.getCharacter(characterName)
+    const character = localState.getCharacter(characterName)
     if (!character) {
       throw new Error("Character not found: " + characterName)
     }
@@ -63,7 +84,7 @@ export default {
     console.log(`   weapon: ${cs.weapon_slot}`)
   },
   gather: async (characterName: string): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(characterName)
+    const character = localState.getCharacter(characterName)
     const res = await api.gather(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -75,7 +96,7 @@ export default {
     return res.error
   },
   craft: async (name: string, code: string, quantity: number): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.craft(character.getName(), code, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -87,7 +108,7 @@ export default {
     return res.error
   },
   equip: async (name: string, code: string, slot: Slot, quantity: number = 1): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.equip(character.getName(), code, slot, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -96,7 +117,7 @@ export default {
     return res.error
   },
   unequip: async (name: string, slot: Slot, quantity: number = 1): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.unequip(character.getName(), slot, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -117,7 +138,7 @@ export default {
     return res.error
   },
   acceptTask: async (name: string): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.acceptTask(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -128,7 +149,7 @@ export default {
     return res.error
   },
   completeTask: async (name: string): Promise<Maybe<Error>> => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.completeTask(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
@@ -138,7 +159,7 @@ export default {
     return res.error
   },
   printTaskStatus: async (name: string) => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const cs = character.characterSchema
     if (cs.task && cs.task.length > 0) {
       console.log(`Task: ${cs.task} - type: ${cs.task_type}`)
@@ -148,43 +169,47 @@ export default {
     }
   },
   depositBank: async (name: string, code: string, quantity: number) => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.depositBank(name, code, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
+      localState.createOrUpdateBank(res.data.bank)
       console.log(`${character.getName()} deposited ${quantity}x ${res.data.item.code}`)
     }
     return res.error
   },
   withdrawBank: async (name: string, code: string, quantity: number) => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.withdrawBank(name, code, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
+      localState.createOrUpdateBank(res.data.bank)
       console.log(`${character.getName()} withdrew ${quantity}x ${res.data.item.code}`)
     }
     return res.error
   },
   depositBankGold: async (name: string, quantity: number) => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.depositBankGold(name, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
+      localState.getBank()?.updateGold(res.data.bank.quantity)
       console.log(`${character.getName()} deposited ${quantity}g`)
     }
     return res.error
   },
   withdrawBankGold: async (name: string, quantity: number) => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.withdrawBankGold(name, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
+      localState.getBank()?.updateGold(res.data.bank.quantity)
       console.log(`${character.getName()} withdrew ${quantity}g`)
     }
     return res.error
   },
   useItem: async (name: string, code: string, quantity: number) => {
-    const character = characters.getCharacter(name)
+    const character = localState.getCharacter(name)
     const res = await api.useItem(name, code, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)

@@ -1,32 +1,26 @@
 import { Character, Pos } from "../gamestate/character.js"
+import { localState } from "../gamestate/localstate.js"
 import { Trigger } from "./decisiongraph/graph.js"
 
 export const alwaysTrigger: Trigger = () => true
 
-//
-// Health
-//
 
-export const lowHealthTrigger = (c: Character, healthAmount: number): Trigger => {
+export const healthPercentTrigger = (c: Character, healthAmount: number): Trigger => {
   return (): boolean => 
     (c.characterSchema.hp / c.characterSchema.max_hp) < healthAmount
 }
 
-export const fullHealthTrigger = (c: Character): Trigger => {
-  return () => c.characterSchema.hp == c.characterSchema.max_hp
+export const healthBelowTrigger = (c: Character, healthAmount: number): Trigger => {
+  return (): boolean => c.characterSchema.hp < healthAmount
 }
 
-//
-// XP & Levels
-//
+export const healthAboveTrigger = (c: Character, healthAmount: number): Trigger => {
+  return (): boolean => c.characterSchema.hp >= healthAmount
+}
 
 export const reachedLevelTrigger = (c: Character, level: number): Trigger => {
   return () => c.characterSchema.level >= level
 }
-
-//
-// Location/Position
-//
 
 export const atPositionTrigger = (c: Character, pos: Pos): Trigger => {
   return () => {
@@ -35,10 +29,6 @@ export const atPositionTrigger = (c: Character, pos: Pos): Trigger => {
     return isThere
   }
 }
-
-// 
-// Cooldown
-//
 
 export const hasCooldownTrigger = (c: Character): Trigger => {
   return () => c.getCooldownSecondsRemaining() > 0
@@ -50,10 +40,44 @@ export const cooldownDoneTrigger = (c: Character): Trigger => {
 
 export const hasItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
   return () => {
-    const itemCount = c.characterSchema.inventory
-      .filter(slot => slot.code === code)
-      .reduce((sum, slot) => sum + slot.quantity, 0)
+    const itemCount = c.getItemCount(code)
     console.log(`Item count: ${code} - ${itemCount}`)
     return itemCount >= quantity
+  }
+}
+
+export const hasLessThanItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
+  return () => {
+    const itemCount = c.getItemCount(code)
+    console.log(`Item count: ${code} - ${itemCount}`)
+    return itemCount < quantity
+  }
+}
+
+export const bankHasItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
+  return () => {
+    const bank = localState.getBank()
+    if (!bank) {
+      console.warn("Couldn't get bank local state.")
+      return false
+    }
+
+    const itemCount = bank.getItemCount(code)
+    console.log(`Item count: ${code} - ${itemCount}`)
+    return itemCount >= quantity
+  }
+}
+
+export const bankHasLessThanItems = (c: Character, code: string, quantity: number): Trigger => {
+  return () => {
+    const bank = localState.getBank()
+    if (!bank) {
+      console.warn("Couldn't get bank local state.")
+      return false
+    }
+
+    const itemCount = bank.getItemCount(code)
+    console.log(`Item count: ${code} - ${itemCount}`)
+    return itemCount < quantity
   }
 }

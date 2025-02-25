@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { axiosInstance } from "../axios.js";
-import { BankGoldTransactionSchema, BankItemTransactionSchema, CharacterFightDataSchema, CharacterMovementDataSchema, CharacterRestDataSchema, CharacterSchema, EquipRequestSchema, GameError, RewardDataSchema, SkillDataSchema, Slot, TaskDataSchema, TaskFullSchema, UseItemSchema } from "./types.js";
+import { BankGoldTransactionSchema, BankItemTransactionSchema, BankSchema, CharacterFightDataSchema, CharacterMovementDataSchema, CharacterRestDataSchema, CharacterSchema, EquipRequestSchema, GameError, RewardDataSchema, SimpleItemSchema, SkillDataSchema, Slot, TaskDataSchema, TaskFullSchema, UseItemSchema } from "./types.js";
 
 type ApiResponse<T> = {
   data?: T
@@ -43,6 +43,12 @@ export default {
   },
   completeTask: async (name: string): Promise<ApiResponse<RewardDataSchema>> => {
     return await doPost(`/my/${name}/action/task/complete`)
+  },
+  getBankDetails: async (): Promise<ApiResponse<BankSchema>> => {
+    return await doGet('/my/bank')
+  },
+  getBankItems: async (): Promise<ApiResponse<SimpleItemSchema[]>> => {
+    return await doGet('/my/bank/items')
   },
   depositBank: async (name: string, code: string, quantity: number): Promise<ApiResponse<BankItemTransactionSchema>> => {
     return await doPost(`/my/${name}/action/bank/deposit`, { code, quantity })

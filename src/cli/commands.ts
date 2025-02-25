@@ -4,9 +4,9 @@ import { buildChickenFightGraph } from "../agent/graphs/chickenFightGraph.js"
 import { buildGatherWoodGraph } from "../agent/graphs/collectWoodGraph.js"
 import { slotSchema } from "../api/types.js"
 import { Character } from "../gamestate/character.js"
-import { characterMap, characters } from "../gamestate/characters.js"
 import { buildCommand, CommandObj, ProcessCommandCode } from "./commandProcessor.js"
 import { buildFishingGraph } from "../agent/graphs/fishingGraph.js"
+import { localState } from "../gamestate/localstate.js"
 
 export const buildCommands = (): CommandObj<any>[] => {
   const commands: CommandObj<any>[] = []
@@ -27,16 +27,11 @@ export const buildCommands = (): CommandObj<any>[] => {
     return ProcessCommandCode.Quit
   }))
   commands.push(buildCommand(['load'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
-    await actions.loadCharacters()
+    await actions.load()
     return ProcessCommandCode.Done
   }))
-
-  //
-  // Status
-  //
-
   commands.push(buildCommand(['list'], emptySchema, async (args: z.infer<typeof emptySchema>): Promise<ProcessCommandCode> => {
-    characterMap.forEach((_, k) => console.log(k));
+    localState.getCharacters().forEach((_, k) => console.log(k));
     return ProcessCommandCode.Done
   }))
   commands.push(buildCommand(['stats'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
@@ -118,20 +113,12 @@ export const buildCommands = (): CommandObj<any>[] => {
   //
 
   commands.push(buildCommand(['run-chicken-fight'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
-    const c: Character = characters.getCharacter(args[0])
+    const c: Character = localState.getCharacter(args[0])
     if (!c) {
       throw new Error("Character not found.")
     }
   
-    const graph = buildChickenFightGraph({
-      character: c,
-      fightLocation: {
-        x: 0,
-        y: 1
-      },
-      minHealth: 0.5,
-      // targetLevel: 2
-    })
+    const graph = buildChickenFightGraph(c)
   
     // Don't await so we can run other commands in the mean time.
     graph.runGraph()
@@ -139,7 +126,7 @@ export const buildCommands = (): CommandObj<any>[] => {
   }))
 
   commands.push(buildCommand(['run-gather-wood'], nameSchema, async (args: z.infer<typeof nameSchema>): Promise<ProcessCommandCode> => {
-    const c: Character = characters.getCharacter(args[0])
+    const c: Character = localState.getCharacter(args[0])
     if (!c) {
       throw new Error("Character not found.")
     }

@@ -1,10 +1,12 @@
-import { CharacterSchema } from "../api/types.js";
+import { CharacterSchema, SimpleItemSchema } from "../api/types.js";
+import { Bank } from "./bank.js";
 import { Character } from "./character.js";
 
 const characterMap = new Map<string, Character>();
+let bank: Bank | undefined
 
-const characters = {
-  addOrUpdate: (cs: CharacterSchema) => {
+export const localState = {
+  addOrUpdateCharacter: (cs: CharacterSchema) => {
     const existing = characterMap.get(cs.name)
     if (existing) {
       existing.updateCharacter(cs)
@@ -18,7 +20,18 @@ const characters = {
       throw new Error("Character not found: " + name)
     }
     return character
+  },
+  getCharacters: () => {
+    return characterMap
+  },
+  createOrUpdateBank(items: SimpleItemSchema[]) {
+    if (bank) {
+      bank.updateItems(items)
+    } else {
+      bank = new Bank(items)
+    }
+  },
+  getBank() {
+    return bank
   }
 }
-
-export { characterMap, characters };

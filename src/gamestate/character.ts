@@ -41,4 +41,10 @@ export class Character {
       y: this.characterSchema.y
     }
   }
+
+  getItemCount(code: string): number {
+    return this.characterSchema.inventory
+      .filter(slot => slot.code === code)
+      .reduce((sum, slot) => sum + slot.quantity, 0)
+  }
 }

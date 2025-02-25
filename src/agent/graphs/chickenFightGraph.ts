@@ -1,43 +1,45 @@
-import { Character, Pos } from "../../gamestate/character.js";
-import { cooldownOperation, fightOperation, moveOperation, noop, restOperation } from "../operations.js";
+import { Character } from "../../gamestate/character.js";
 import { buildNode, Graph } from "../decisiongraph/graph.js";
-import { alwaysTrigger, atPositionTrigger, cooldownDoneTrigger, fullHealthTrigger, hasCooldownTrigger, lowHealthTrigger, reachedLevelTrigger } from "../triggers.js";
+import { fightOperation, moveOperation, noop, useItemOperation, waitOperation, withdrawOperation } from "../operations.js";
+import { alwaysTrigger, atPositionTrigger, bankHasItemsTrigger, bankHasLessThanItems, hasItemsTrigger, hasLessThanItemsTrigger, healthAboveTrigger, healthBelowTrigger } from "../triggers.js";
 import { addCooldownNode } from "./helpers.js";
 
-type ChickenFightGraphParams = {
-  character: Character
-  fightLocation: Pos
-  minHealth: number
-}
-
-export const buildChickenFightGraph = (params: ChickenFightGraphParams): Graph => {
-  const c = params.character
+export const buildChickenFightGraph = (c: Character): Graph => {
   const g = new Graph()
 
+  const fightLocation = {x: 0, y: 1}
+  const bank = { x: 4, y: 1 }
+  const foodCode = "cooked_gudgeon"
+  const foodAmount = 10
+  const healBelow = c.characterSchema.max_hp - 70
+
   // Nodes
-  g.startingNode = buildNode("start",  noop)
+  g.startingNode = buildNode("start", noop)
   g.addNode(g.startingNode)
-
-  // 1. Move to location
-  g.buildAndAddNode("move", moveOperation(c, params.fightLocation))
-  addCooldownNode(g, "move", c)
-
-  // 2. Fight
+  g.buildAndAddNode("move-fight", moveOperation(c, fightLocation))
+  addCooldownNode(g, "move-fight", c)
   g.buildAndAddNode("fight", fightOperation(c))
   addCooldownNode(g, "fight", c)
-
-  // 3. Heal
-  g.addNode(buildNode("heal", restOperation(c)))
+  g.addNode(buildNode("heal", useItemOperation(c, foodCode, 1)))
   addCooldownNode(g, "heal", c)
-
-  // 4. End 
-  g.addNode(buildNode("end", noop))
+  g.buildAndAddNode("move-bank", moveOperation(c, bank))
+  addCooldownNode(g, "move-bank", c)
+  g.buildAndAddNode("check-amount", noop)
+  g.buildAndAddNode("wait", waitOperation(20))
+  g.buildAndAddNode("withdraw", withdrawOperation(c, foodCode, foodAmount))
+  addCooldownNode(g, "withdraw", c)
   
   // Edges
-  g.addEdge("start", "move", alwaysTrigger)
-  g.addEdge("move", "fight", atPositionTrigger(c, params.fightLocation))
-  g.addEdge("fight", "heal", lowHealthTrigger(c, params.minHealth))
-  g.addEdge("heal", "fight", fullHealthTrigger(c))
+  g.addEdge("start", "move-fight", alwaysTrigger)
+  g.addEdge("move-fight", "fight", atPositionTrigger(c, fightLocation))
+  g.addEdge("fight", "heal", healthBelowTrigger(c, healBelow))
+  g.addEdge("heal", "move-bank", hasLessThanItemsTrigger(c, foodCode, 1))
+  g.addEdge("heal", "fight", healthAboveTrigger(c, healBelow))
+  g.addEdge("move-bank", "check-amount", atPositionTrigger(c, bank))
+  g.addEdge("check-amount", "wait", bankHasLessThanItems(c, foodCode, foodAmount))
+  g.addEdge("check-amount", "withdraw", bankHasItemsTrigger(c, foodCode, foodAmount))
+  g.addEdge("withdraw", "move-fight", hasItemsTrigger(c, foodCode, 10))
+
   // g.addEdge("fight", "end", reachedLevelTrigger(c, 2))
 
   return g

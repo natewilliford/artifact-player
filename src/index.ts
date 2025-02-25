@@ -9,7 +9,7 @@ const main = async () => {
   console.log('Starting up!');
 
   console.log("Loading characters.")
-  await actions.loadCharacters()
+  await actions.load()
 
   const commandProcessor = new CommandProcessor(buildCommands())
   const rl = readline.createInterface({ input, output })

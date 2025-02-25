@@ -62,8 +62,8 @@ class Graph {
 
   async resolveError(): Promise<Maybe<Error>> {
     // TODO: Make this configurable?
-    console.log("Trying to resolve error by reloading characters.")
-    return await actions.loadCharacters()
+    console.log("Trying to resolve error by reloading.")
+    return await actions.load()
   }
 
   async runGraph() {
