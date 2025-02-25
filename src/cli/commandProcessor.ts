@@ -49,7 +49,13 @@ class CommandProcessor {
     const parseResults = com.argsSchema.safeParse(args)
     if (parseResults.success) {
       console.log(parseResults.data)
-      return await com.commandOperation(parseResults.data)
+      try {
+        return await com.commandOperation(parseResults.data)
+      } catch (err) {
+        console.warn(err)
+        return ProcessCommandCode.Done
+      }
+
     } else {
       parseResults.error.issues.forEach(iss => {
         console.warn(`${iss.message} - arg: ${iss.path}`)

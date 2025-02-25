@@ -14,7 +14,7 @@ export const localState = {
       characterMap.set(cs.name, new Character(cs))
     }
   },
-  getCharacter: (name: string) => {
+  getCharacter: (name: string): Character => {
     const character = characterMap.get(name)
     if (!character) {
       throw new Error("Character not found: " + name)
