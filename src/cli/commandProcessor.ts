@@ -1,17 +1,19 @@
-import { ZodSchema } from "zod"
+import { z, ZodSchema } from "zod"
+import { Character } from "../gamestate/character.js"
 
-enum ProcessCommandCode {
+export enum ProcessCommandCode {
   Done,
   Unrecognized,
   Quit
 }
 
-interface CommandObj<T> {
+export type CommandObj<T> = {
   commandNames: string[] // Valid ways of calling. 
   argsSchema: ZodSchema
-  commandOperation: (args: T) => Promise<ProcessCommandCode>
+  commandOperation: (args: T) => Promise<void>
 }
-const buildCommand = <T>(names: string[], argsSchema: ZodSchema, op: (args: T) => Promise<ProcessCommandCode>): CommandObj<T> => {
+
+export const buildCommand = <T>(names: string[], argsSchema: ZodSchema, op: (args: T) => Promise<void>): CommandObj<T> => {
     return {
       commandNames: names,
       argsSchema,
@@ -19,9 +21,8 @@ const buildCommand = <T>(names: string[], argsSchema: ZodSchema, op: (args: T) =
     }
 }
 
-class CommandProcessor {
+export class CommandProcessor {
   commandMap = new Map<string, CommandObj<any>>()
-
   constructor(commands: CommandObj<any>[]) {
     commands.forEach(c => this.addCommand(c))
   }
@@ -49,8 +50,12 @@ class CommandProcessor {
     const parseResults = com.argsSchema.safeParse(args)
     if (parseResults.success) {
       try {
-        return await com.commandOperation(parseResults.data)
+        await com.commandOperation(parseResults.data)
+        return ProcessCommandCode.Done
       } catch (err) {
+        if (err instanceof QuitError) {
+          return ProcessCommandCode.Quit
+        } 
         console.warn(err)
         return ProcessCommandCode.Done
       }
@@ -63,4 +68,9 @@ class CommandProcessor {
   }
 }
 
-export { buildCommand, CommandObj, CommandProcessor, ProcessCommandCode }
+export class QuitError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = "QuitError"
+  }
+}
