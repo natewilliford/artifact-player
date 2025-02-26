@@ -1,4 +1,4 @@
-import { SimpleItemSchema } from "../api/types.js"
+import { SimpleItemSchema } from '../api/types.js'
 
 export class Bank {
   items: SimpleItemSchema[]
@@ -18,8 +18,7 @@ export class Bank {
 
   getItemCount(code: string): number {
     return this.items
-      .filter(item => item.code === code)
+      .filter((item) => item.code === code)
       .reduce((sum, item) => sum + item.quantity, 0)
   }
 }
-

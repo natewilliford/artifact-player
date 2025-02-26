@@ -1,13 +1,13 @@
-import actions from "../actions/actions.js";
-import { Character, Pos } from "../gamestate/character.js";
-import { delay } from "../util.js";
-import { Operation } from "./decisiongraph/graph.js";
+import actions from '../actions/actions.js'
+import { Character, Pos } from '../gamestate/character.js'
+import { delay } from '../util.js'
+import { Operation } from './decisiongraph/graph.js'
 
 export const noop: Operation = async () => null
 
 export const moveOperation = (c: Character, pos: Pos): Operation => {
   return async () => {
-     return await actions.moveCharacter(c.getName(), pos.x, pos.y)
+    return await actions.moveCharacter(c.getName(), pos.x, pos.y)
   }
 }
 
@@ -40,32 +40,47 @@ export const restOperation = (c: Character): Operation => {
 }
 
 export const gatherOperation = (c: Character): Operation => {
-  return async() => {
+  return async () => {
     return await actions.gather(c.getName())
   }
 }
 
-export const craftOperation = (c: Character, code: string, quantity: number): Operation => {
-  return async() => {
+export const craftOperation = (
+  c: Character,
+  code: string,
+  quantity: number
+): Operation => {
+  return async () => {
     return await actions.craft(c.getName(), code, quantity)
   }
 }
 
-export const depositOperation = (c: Character, code: string, quantity: number): Operation => {
-  return async() => {
+export const depositOperation = (
+  c: Character,
+  code: string,
+  quantity: number
+): Operation => {
+  return async () => {
     return await actions.depositBank(c.getName(), code, quantity)
   }
 }
 
-export const withdrawOperation = (c: Character, code: string, quantity: number): Operation => {
-  return async() => {
+export const withdrawOperation = (
+  c: Character,
+  code: string,
+  quantity: number
+): Operation => {
+  return async () => {
     return await actions.withdrawBank(c.getName(), code, quantity)
   }
 }
 
-export const useItemOperation = (c: Character, code: string, quantity: number): Operation => {
-  return async() => {
+export const useItemOperation = (
+  c: Character,
+  code: string,
+  quantity: number
+): Operation => {
+  return async () => {
     return await actions.useItem(c.getName(), code, quantity)
   }
 }
-

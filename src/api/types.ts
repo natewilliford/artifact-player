@@ -1,44 +1,44 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 export type CooldownSchema = {
-  total_seconds: number;
-  remaining_seconds: number;
-  started_at: string; // '2025-02-22T19:47:16.464Z'
-  expiration: string;
-  reason: string; // 'movement', 'fight', 'crafting', 'gathering'...
+  total_seconds: number
+  remaining_seconds: number
+  started_at: string // '2025-02-22T19:47:16.464Z'
+  expiration: string
+  reason: string // 'movement', 'fight', 'crafting', 'gathering'...
 }
 
 export type MapContentSchema = {
-  type: string;
-  code: string;
+  type: string
+  code: string
 }
 
 export type MapSchema = {
-  name: string;
-  skin: string;
-  x: number;
-  y: number;
-  content: MapContentSchema | null;
+  name: string
+  skin: string
+  x: number
+  y: number
+  content: MapContentSchema | null
 }
 
 export type InventorySlot = {
-  slot: number;
-  code: string; // The item code.
-  quantity: number;
+  slot: number
+  code: string // The item code.
+  quantity: number
 }
 
 export type CharacterSchema = {
-  name: string;
-  account: string;
-  skin: string;
-  level: number;
+  name: string
+  account: string
+  skin: string
+  level: number
   xp: number
   max_xp: number // xp needed to level up.
   gold: number
   // ...
   hp: number
   max_hp: number
-  // ... 
+  // ...
   x: number
   y: number
   cooldown: number // seconds remaining.
@@ -52,30 +52,28 @@ export type CharacterSchema = {
   leg_armor_slot: string
   boots_slot: string
 
-
   // ...
-  inventory: InventorySlot[];
+  inventory: InventorySlot[]
 
   task: string
   task_type: string
   task_progress: number
   task_total: number
-
 }
 
 export type DropSchema = {
-  code: string;
-  quantity: number;
+  code: string
+  quantity: number
 }
 
 export type FightSchema = {
-  xp: number;
-  gold: number;
-  drops: DropSchema[];
-  turns: number;
+  xp: number
+  gold: number
+  drops: DropSchema[]
+  turns: number
   // ...
-  logs: string[];
-  result: 'win' | 'loss';
+  logs: string[]
+  result: 'win' | 'loss'
 }
 
 export type ItemSchema = {
@@ -85,39 +83,39 @@ export type ItemSchema = {
   // ...
 }
 
-export const slotSchema = z.enum(["weapon", "shield", "helmet", 'body_armor']);
+export const slotSchema = z.enum(['weapon', 'shield', 'helmet', 'body_armor'])
 export type Slot = z.infer<typeof slotSchema>
 
 // Responses
-export type CharacterMovementDataSchema = { 
-  cooldown: CooldownSchema;
-  destination: MapSchema;
-  character: CharacterSchema;
+export type CharacterMovementDataSchema = {
+  cooldown: CooldownSchema
+  destination: MapSchema
+  character: CharacterSchema
 }
 
 export type CharacterFightDataSchema = {
-  cooldown: CooldownSchema;
-  fight: FightSchema;
-  character: CharacterSchema;
+  cooldown: CooldownSchema
+  fight: FightSchema
+  character: CharacterSchema
 }
 
 export type CharacterRestDataSchema = {
-  cooldown: CooldownSchema;
-  hp_restored: number;
-  character: CharacterSchema;
+  cooldown: CooldownSchema
+  hp_restored: number
+  character: CharacterSchema
 }
 
 export type GameErrorError = {
-  code: number;
-  message: string;
+  code: number
+  message: string
 }
 
 export type GameError = {
-  error: GameErrorError;
+  error: GameErrorError
 }
 
 export type SkillInfoSchema = {
-  xp: number,
+  xp: number
   items: DropSchema[]
 }
 
@@ -202,4 +200,3 @@ export type UseItemSchema = {
   item: ItemSchema
   character: CharacterSchema
 }
-

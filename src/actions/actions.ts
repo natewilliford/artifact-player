@@ -1,6 +1,6 @@
-import api from "../api/api.js";
-import { RewardsSchema, Slot } from "../api/types.js";
-import { localState } from "../gamestate/localstate.js";
+import api from '../api/api.js'
+import { RewardsSchema, Slot } from '../api/types.js'
+import { localState } from '../gamestate/localstate.js'
 
 export default {
   load: async (): Promise<Maybe<Error>> => {
@@ -10,8 +10,8 @@ export default {
 
     const charactersRes = await getCharactersPromise
     if (charactersRes.data) {
-      charactersRes.data.forEach(cs => {
-        console.log("Loaded character: " + cs.name)
+      charactersRes.data.forEach((cs) => {
+        console.log('Loaded character: ' + cs.name)
         localState.addOrUpdateCharacter(cs)
       })
     } else {
@@ -20,7 +20,7 @@ export default {
 
     const bankItemsRes = await getBankItemsPromise
     if (bankItemsRes.data) {
-      console.log("Loaded bank items.")
+      console.log('Loaded bank items.')
       localState.createOrUpdateBank(bankItemsRes.data)
     } else {
       return bankItemsRes.error
@@ -28,19 +28,25 @@ export default {
 
     const bankRes = await getBankDetailsPromise
     if (bankRes.data) {
-      console.log("Loaded bank details.")
+      console.log('Loaded bank details.')
       localState.getBank()?.updateGold(bankRes.data.gold)
     } else {
       return bankRes.error
     }
   },
-  moveCharacter: async (characterName: string, x: number, y: number): Promise<Maybe<Error>> => {
+  moveCharacter: async (
+    characterName: string,
+    x: number,
+    y: number
+  ): Promise<Maybe<Error>> => {
     const character = localState.getCharacter(characterName)
     const res = await api.moveCharacter(character.getName(), x, y)
     if (res.data) {
-      character.updateCharacter(res.data.character);
+      character.updateCharacter(res.data.character)
       const newPos = character.getPosition()
-      console.log(`${character.getName()} moved to ${newPos.x}, ${newPos.y} - ${res.data.destination.name}`);
+      console.log(
+        `${character.getName()} moved to ${newPos.x}, ${newPos.y} - ${res.data.destination.name}`
+      )
       character.getCoolDownExpiration()
     }
     return res.error
@@ -50,7 +56,9 @@ export default {
     const res = await api.fight(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} fight result: ${res.data.fight.result} - ${res.data.fight.logs[0]}`);
+      console.log(
+        `${character.getName()} fight result: ${res.data.fight.result} - ${res.data.fight.logs[0]}`
+      )
     }
     return res.error
   },
@@ -59,14 +67,16 @@ export default {
     const res = await api.rest(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} rested and restored ${res.data.hp_restored}hp.`)
+      console.log(
+        `${character.getName()} rested and restored ${res.data.hp_restored}hp.`
+      )
     }
     return res.error
   },
   printStats: (characterName: string) => {
     const character = localState.getCharacter(characterName)
     if (!character) {
-      throw new Error("Character not found: " + characterName)
+      throw new Error('Character not found: ' + characterName)
     }
     const cs = character.characterSchema
     console.log(`Cooldown: ${character.getCooldownSecondsRemaining()}s`)
@@ -75,7 +85,7 @@ export default {
     console.log(`      Xp: ${cs.xp}/${cs.max_xp}`)
     console.log(`    Gold: ${cs.gold}`)
     console.log(`Inventory: `)
-    cs.inventory.forEach(inv => {
+    cs.inventory.forEach((inv) => {
       if (inv.quantity > 0) {
         console.log(`  ${inv.slot}: ${inv.quantity}x - ${inv.code}`)
       }
@@ -88,48 +98,71 @@ export default {
     const res = await api.gather(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} gathered and gained ${res.data.details.xp}xp and items:`)
-      res.data.details.items.forEach(i => {
+      console.log(
+        `${character.getName()} gathered and gained ${res.data.details.xp}xp and items:`
+      )
+      res.data.details.items.forEach((i) => {
         console.log(`  ${i.quantity}x - ${i.code}`)
       })
     }
     return res.error
   },
-  craft: async (name: string, code: string, quantity: number): Promise<Maybe<Error>> => {
+  craft: async (
+    name: string,
+    code: string,
+    quantity: number
+  ): Promise<Maybe<Error>> => {
     const character = localState.getCharacter(name)
     const res = await api.craft(character.getName(), code, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} crafted and gained ${res.data.details.xp}xp and items:`)
-      res.data.details.items.forEach(i => {
+      console.log(
+        `${character.getName()} crafted and gained ${res.data.details.xp}xp and items:`
+      )
+      res.data.details.items.forEach((i) => {
         console.log(`  ${i.quantity}x - ${i.code}`)
       })
-    } 
+    }
     return res.error
   },
-  equip: async (name: string, code: string, slot: Slot, quantity: number = 1): Promise<Maybe<Error>> => {
+  equip: async (
+    name: string,
+    code: string,
+    slot: Slot,
+    quantity: number = 1
+  ): Promise<Maybe<Error>> => {
     const character = localState.getCharacter(name)
     const res = await api.equip(character.getName(), code, slot, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} equipped ${res.data.item.code} in ${res.data.slot}`)
+      console.log(
+        `${character.getName()} equipped ${res.data.item.code} in ${res.data.slot}`
+      )
     }
     return res.error
   },
-  unequip: async (name: string, slot: Slot, quantity: number = 1): Promise<Maybe<Error>> => {
+  unequip: async (
+    name: string,
+    slot: Slot,
+    quantity: number = 1
+  ): Promise<Maybe<Error>> => {
     const character = localState.getCharacter(name)
     const res = await api.unequip(character.getName(), slot, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} unequipped ${res.data.item.code} in ${res.data.slot}`)
+      console.log(
+        `${character.getName()} unequipped ${res.data.item.code} in ${res.data.slot}`
+      )
     }
     return res.error
   },
   getTasks: async (): Promise<Maybe<Error>> => {
     const res = await api.getTasks()
     if (res.data) {
-      res.data.forEach(task => {
-        console.log(`Task - ${task.code} - level: ${task.level} - type: ${task.type} - min_quantity: ${task.min_quantity} - max_quantity: ${task.max_quantity}`)
+      res.data.forEach((task) => {
+        console.log(
+          `Task - ${task.code} - level: ${task.level} - type: ${task.type} - min_quantity: ${task.min_quantity} - max_quantity: ${task.max_quantity}`
+        )
         console.log(`  skill: ${task.skill}`)
         console.log(`  rewards - gold: ${task.rewards.gold}`)
         logRewards(task.rewards)
@@ -142,7 +175,9 @@ export default {
     const res = await api.acceptTask(character.getName())
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} accepted task ${res.data.task.code} - type: ${res.data.task.type} - total: ${res.data.task.total}`)
+      console.log(
+        `${character.getName()} accepted task ${res.data.task.code} - type: ${res.data.task.type} - total: ${res.data.task.total}`
+      )
       console.log('  Rewards: ')
       logRewards(res.data.task.rewards)
     }
@@ -162,7 +197,9 @@ export default {
     const character = localState.getCharacter(name)
     const cs = character.characterSchema
     if (cs.task && cs.task.length > 0) {
-      console.log(`${name}: ${cs.task} - type: ${cs.task_type} - progress: ${cs.task_progress}/${cs.task_total}`)
+      console.log(
+        `${name}: ${cs.task} - type: ${cs.task_type} - progress: ${cs.task_progress}/${cs.task_total}`
+      )
     } else {
       console.log(`${name}: no task`)
     }
@@ -173,7 +210,9 @@ export default {
     if (res.data) {
       character.updateCharacter(res.data.character)
       localState.createOrUpdateBank(res.data.bank)
-      console.log(`${character.getName()} deposited ${quantity}x ${res.data.item.code}`)
+      console.log(
+        `${character.getName()} deposited ${quantity}x ${res.data.item.code}`
+      )
     }
     return res.error
   },
@@ -183,7 +222,9 @@ export default {
     if (res.data) {
       character.updateCharacter(res.data.character)
       localState.createOrUpdateBank(res.data.bank)
-      console.log(`${character.getName()} withdrew ${quantity}x ${res.data.item.code}`)
+      console.log(
+        `${character.getName()} withdrew ${quantity}x ${res.data.item.code}`
+      )
     }
     return res.error
   },
@@ -212,14 +253,16 @@ export default {
     const res = await api.useItem(name, code, quantity)
     if (res.data) {
       character.updateCharacter(res.data.character)
-      console.log(`${character.getName()} used item ${quantity}x ${res.data.item.code}`)
+      console.log(
+        `${character.getName()} used item ${quantity}x ${res.data.item.code}`
+      )
     }
     return res.error
   },
 }
 
 const logRewards = (rewards: RewardsSchema) => {
-  rewards.items.forEach(item => {
+  rewards.items.forEach((item) => {
     console.log(`    ${item.quantity}x - ${item.code}`)
   })
 }

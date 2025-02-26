@@ -1,5 +1,5 @@
-import actions from "../../actions/actions.js"
-import { Character } from "../../gamestate/character.js"
+import actions from '../../actions/actions.js'
+import { Character } from '../../gamestate/character.js'
 
 type Trigger = () => boolean
 type Operation = () => Promise<Maybe<Error>>
@@ -18,7 +18,7 @@ type Node = {
 const buildNode = (nodeId: string, op: Operation) => {
   return {
     id: nodeId,
-    doOperation: op
+    doOperation: op,
   }
 }
 
@@ -35,7 +35,7 @@ class Graph {
     error: Error
     node: string
   }
-  
+
   // Character for logging. Ops should have their own ref.
   character: Character
   running = false
@@ -48,7 +48,7 @@ class Graph {
 
   addNode(n: Node) {
     if (this.nodes.get(n.id)) {
-      throw new Error("Graph already contains node with id: " + n.id)
+      throw new Error('Graph already contains node with id: ' + n.id)
     }
     this.nodes.set(n.id, n)
   }
@@ -61,7 +61,7 @@ class Graph {
     const e: Edge = {
       fromNodeId: fromNode,
       toNodeId: toNode,
-      shouldTrigger: condition
+      shouldTrigger: condition,
     }
     const existingFromNodeList = this.edges.get(e.fromNodeId)
     if (existingFromNodeList) {
@@ -73,19 +73,19 @@ class Graph {
 
   async resolveError(): Promise<Maybe<Error>> {
     // TODO: Make this configurable?
-    console.log("Trying to resolve error by reloading.")
+    console.log('Trying to resolve error by reloading.')
     return await actions.load()
   }
 
   // Returns imediately, but graph runs async.
   runGraph() {
     this.running = true
-    this.runningPromise = this.doRunGraph()  
+    this.runningPromise = this.doRunGraph()
   }
 
   async doRunGraph() {
     let node = this.startingNode
-    while(this.running) {  
+    while (this.running) {
       if (!node) {
         console.warn(`Null node.`)
         break
@@ -102,7 +102,7 @@ class Graph {
         continue
       }
 
-      if (node.id === "end") {
+      if (node.id === 'end') {
         this.running = false
         continue
       }
@@ -118,7 +118,9 @@ class Graph {
       for (let i = 0; i < edges.length; i++) {
         let e = edges[i]
         if (e.shouldTrigger()) {
-          console.log(`${this.character.getName()}: ${e.fromNodeId} -> ${e.toNodeId}`)
+          console.log(
+            `${this.character.getName()}: ${e.fromNodeId} -> ${e.toNodeId}`
+          )
           node = this.nodes.get(e.toNodeId)
           if (!node) {
             console.warn(`Null node with id ${e.toNodeId}`)
@@ -136,7 +138,7 @@ class Graph {
         if (opError) {
           this.operationError = {
             error: opError,
-            node: node.id
+            node: node.id,
           }
         }
       }

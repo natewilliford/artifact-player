@@ -1,16 +1,16 @@
-import 'dotenv/config';
-import { stdin as input, stdout as output } from 'node:process';
-import * as readline from 'node:readline/promises';
-import actions from './actions/actions.js';
-import { BehaviorRunner } from './behavior/behaviorRunner.js';
-import { buildBehaviors } from './behavior/behaviors.js';
-import { CommandProcessor, ProcessCommandCode } from './cli/commandProcessor.js';
-import { buildCommands } from './cli/commands.js';
+import 'dotenv/config'
+import { stdin as input, stdout as output } from 'node:process'
+import * as readline from 'node:readline/promises'
+import actions from './actions/actions.js'
+import { BehaviorRunner } from './behavior/behaviorRunner.js'
+import { buildBehaviors } from './behavior/behaviors.js'
+import { CommandProcessor, ProcessCommandCode } from './cli/commandProcessor.js'
+import { buildCommands } from './cli/commands.js'
 
 const main = async () => {
-  console.log('Starting up!');
+  console.log('Starting up!')
 
-  console.log("Loading characters.")
+  console.log('Loading characters.')
   await actions.load()
 
   const behaviorRunner = new BehaviorRunner(buildBehaviors())
@@ -18,24 +18,24 @@ const main = async () => {
   const rl = readline.createInterface({ input, output })
   let quitting = false
   try {
-    while(!quitting) {
+    while (!quitting) {
       try {
-        const answer = await rl.question("command: ")
+        const answer = await rl.question('command: ')
         const commandCode = await commandProcessor.runCommand(answer)
         switch (commandCode) {
           case ProcessCommandCode.Unrecognized:
-            throw new Error("Unrecognized command.")
+            throw new Error('Unrecognized command.')
           case ProcessCommandCode.Quit:
-            console.log("Quitting.")
+            console.log('Quitting.')
             quitting = true
           case ProcessCommandCode.Done:
             // Expected. Do nothing.
             break
-          default: 
-            console.error("Unrecognized process command code: " + commandCode)
+          default:
+            console.error('Unrecognized process command code: ' + commandCode)
         }
       } catch (err) {
-        console.error(err) 
+        console.error(err)
       }
     }
   } finally {
@@ -43,4 +43,4 @@ const main = async () => {
   }
 }
 
-main();
+main()

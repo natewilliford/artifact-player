@@ -1,8 +1,8 @@
-import { Character } from "../gamestate/character.js"
-import { Graph } from "./decisiongraph/graph.js"
-import { buildChickenFightGraph } from "./graphs/chickenFightGraph.js"
-import { buildGatherWoodGraph } from "./graphs/collectWoodGraph.js"
-import { buildFishingGraph } from "./graphs/fishingGraph.js"
+import { Character } from '../gamestate/character.js'
+import { Graph } from './decisiongraph/graph.js'
+import { buildChickenFightGraph } from './graphs/chickenFightGraph.js'
+import { buildGatherWoodGraph } from './graphs/collectWoodGraph.js'
+import { buildFishingGraph } from './graphs/fishingGraph.js'
 
 export type BehaviorObj = {
   name: string
@@ -13,25 +13,25 @@ export const buildBehaviors = (): BehaviorObj[] => {
   const behaviors: BehaviorObj[] = []
 
   behaviors.push({
-    name: "fight-chicken",
-    buildGraph: (c: Character) => buildChickenFightGraph(c)
+    name: 'fight-chicken',
+    buildGraph: (c: Character) => buildChickenFightGraph(c),
   })
 
   behaviors.push({
-    name: "fishing",
-    buildGraph: (c: Character) => buildFishingGraph(c)
+    name: 'fishing',
+    buildGraph: (c: Character) => buildFishingGraph(c),
   })
 
   behaviors.push({
-    name: "gather-wood",
-    buildGraph: (c: Character) => buildGatherWoodGraph({
+    name: 'gather-wood',
+    buildGraph: (c: Character) =>
+      buildGatherWoodGraph({
         character: c,
         gatherLocation: { x: -1, y: 0 },
         gatherAmount: 10,
-        gatherItemCode: "ash_wood"
-      })
-    })
+        gatherItemCode: 'ash_wood',
+      }),
+  })
 
   return behaviors
 }
-

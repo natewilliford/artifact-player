@@ -1,19 +1,28 @@
-import { Character, Pos } from "../gamestate/character.js"
-import { localState } from "../gamestate/localstate.js"
-import { Trigger } from "./decisiongraph/graph.js"
+import { Character, Pos } from '../gamestate/character.js'
+import { localState } from '../gamestate/localstate.js'
+import { Trigger } from './decisiongraph/graph.js'
 
 export const alwaysTrigger: Trigger = () => true
 
-export const healthPercentTrigger = (c: Character, healthAmount: number): Trigger => {
-  return (): boolean => 
-    (c.characterSchema.hp / c.characterSchema.max_hp) < healthAmount
+export const healthPercentTrigger = (
+  c: Character,
+  healthAmount: number
+): Trigger => {
+  return (): boolean =>
+    c.characterSchema.hp / c.characterSchema.max_hp < healthAmount
 }
 
-export const healthBelowTrigger = (c: Character, healthAmount: number): Trigger => {
+export const healthBelowTrigger = (
+  c: Character,
+  healthAmount: number
+): Trigger => {
   return (): boolean => c.characterSchema.hp < healthAmount
 }
 
-export const healthAboveTrigger = (c: Character, healthAmount: number): Trigger => {
+export const healthAboveTrigger = (
+  c: Character,
+  healthAmount: number
+): Trigger => {
   return (): boolean => c.characterSchema.hp >= healthAmount
 }
 
@@ -33,15 +42,27 @@ export const cooldownDoneTrigger = (c: Character): Trigger => {
   return () => c.getCooldownSecondsRemaining() === 0
 }
 
-export const hasItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
+export const hasItemsTrigger = (
+  c: Character,
+  code: string,
+  quantity: number
+): Trigger => {
   return () => c.getItemCount(code) >= quantity
 }
 
-export const hasLessThanItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
+export const hasLessThanItemsTrigger = (
+  c: Character,
+  code: string,
+  quantity: number
+): Trigger => {
   return () => c.getItemCount(code) < quantity
 }
 
-export const bankHasItemsTrigger = (c: Character, code: string, quantity: number): Trigger => {
+export const bankHasItemsTrigger = (
+  c: Character,
+  code: string,
+  quantity: number
+): Trigger => {
   return () => {
     const bank = localState.getBank()
     if (!bank) {
@@ -52,7 +73,11 @@ export const bankHasItemsTrigger = (c: Character, code: string, quantity: number
   }
 }
 
-export const bankHasLessThanItems = (c: Character, code: string, quantity: number): Trigger => {
+export const bankHasLessThanItems = (
+  c: Character,
+  code: string,
+  quantity: number
+): Trigger => {
   return () => {
     const bank = localState.getBank()
     if (!bank) {

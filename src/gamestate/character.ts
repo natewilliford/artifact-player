@@ -1,9 +1,9 @@
-import { addSeconds } from "date-fns";
-import { CharacterSchema } from "../api/types.js";
+import { addSeconds } from 'date-fns'
+import { CharacterSchema } from '../api/types.js'
 
 export type Pos = {
-  x: number;
-  y: number;
+  x: number
+  y: number
 }
 
 export class Character {
@@ -27,7 +27,10 @@ export class Character {
   getCooldownSecondsRemaining(): number {
     const now = new Date()
     // Use millis directly since date-fns Durations don't include milliseconds.
-    const millis = Math.max(this.getCoolDownExpiration().getTime() - now.getTime(), 0)
+    const millis = Math.max(
+      this.getCoolDownExpiration().getTime() - now.getTime(),
+      0
+    )
     return millis / 1000
   }
 
@@ -37,14 +40,14 @@ export class Character {
 
   getPosition(): Pos {
     return {
-      x: this.characterSchema.x, 
-      y: this.characterSchema.y
+      x: this.characterSchema.x,
+      y: this.characterSchema.y,
     }
   }
 
   getItemCount(code: string): number {
     return this.characterSchema.inventory
-      .filter(slot => slot.code === code)
+      .filter((slot) => slot.code === code)
       .reduce((sum, slot) => sum + slot.quantity, 0)
   }
 }

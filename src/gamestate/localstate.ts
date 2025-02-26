@@ -1,8 +1,8 @@
-import { CharacterSchema, SimpleItemSchema } from "../api/types.js";
-import { Bank } from "./bank.js";
-import { Character } from "./character.js";
+import { CharacterSchema, SimpleItemSchema } from '../api/types.js'
+import { Bank } from './bank.js'
+import { Character } from './character.js'
 
-const characterMap = new Map<string, Character>();
+const characterMap = new Map<string, Character>()
 let bank: Bank | undefined
 
 export const localState = {
@@ -17,7 +17,7 @@ export const localState = {
   getCharacter: (name: string): Character => {
     const character = characterMap.get(name)
     if (!character) {
-      throw new Error("Character not found: " + name)
+      throw new Error('Character not found: ' + name)
     }
     return character
   },
@@ -33,5 +33,5 @@ export const localState = {
   },
   getBank() {
     return bank
-  }
+  },
 }
