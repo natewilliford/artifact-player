@@ -1,48 +1,62 @@
 import { Character, Pos } from '../../gamestate/character.js'
+import { items } from '../../gamestate/items.js'
+import { locations } from '../../gamestate/locations.js'
 import { buildNode, Graph } from '../decisiongraph/graph.js'
-import { gatherOperation, moveOperation, noop } from '../operations.js'
+import {
+  depositAllOperation,
+  gatherOperation,
+  moveOperation,
+  noop,
+} from '../operations.js'
 import {
   alwaysTrigger,
   atPositionTrigger,
   hasItemsTrigger,
+  hasLessThanItemsTrigger,
+  taskDoneTrigger,
 } from '../triggers.js'
 import { addCooldownNode } from './helpers.js'
 
-type CollectWoodGraphParams = {
-  character: Character
-  gatherLocation: Pos
-  gatherItemCode: string
-  gatherAmount: number
-  // bankLocation: Pos,
-}
+export const buildGatherWoodGraph = (c: Character): Graph => {
+  const loc: Pos = { x: 6, y: 1 }
 
-export const buildGatherWoodGraph = (params: CollectWoodGraphParams): Graph => {
-  const c = params.character
   const g = new Graph(c)
+  const batchCount = 20
 
   // Nodes
   g.startingNode = buildNode('start', noop)
   g.addNode(g.startingNode)
+  g.addEdge('start', 'move-forest', alwaysTrigger)
 
-  // 1. Move to location
-  g.buildAndAddNode('move', moveOperation(c, params.gatherLocation))
-  addCooldownNode(g, 'move', c)
+  g.buildAndAddNode('move-forest', moveOperation(c, loc))
+  addCooldownNode(g, 'move-forest', c)
+  g.addEdge('move-forest', 'gather', atPositionTrigger(c, loc))
 
-  // 2. Collect resources
   g.buildAndAddNode('gather', gatherOperation(c))
   addCooldownNode(g, 'gather', c)
-
-  // 3. Done
-  g.buildAndAddNode('end', noop)
-
-  // Edges
-  g.addEdge('start', 'move', alwaysTrigger)
-  g.addEdge('move', 'gather', atPositionTrigger(c, params.gatherLocation))
   g.addEdge(
     'gather',
-    'end',
-    hasItemsTrigger(c, params.gatherItemCode, params.gatherAmount)
+    'move-bank',
+    hasItemsTrigger(c, items.resources.ashWood, batchCount)
   )
+
+  g.buildAndAddNode('move-bank', moveOperation(c, locations.bank))
+  addCooldownNode(g, 'move-bank', c)
+  g.addEdge('move-bank', 'deposit', atPositionTrigger(c, locations.bank))
+
+  g.buildAndAddNode(
+    'deposit',
+    depositAllOperation(c, [items.resources.ashWood, items.resources.sap])
+  )
+  addCooldownNode(g, 'deposit', c)
+  g.addEdge('deposit', 'end', taskDoneTrigger(c))
+  g.addEdge(
+    'deposit',
+    'move-forest',
+    hasLessThanItemsTrigger(c, items.resources.ashWood, batchCount)
+  )
+
+  g.buildAndAddNode('end', noop)
 
   return g
 }

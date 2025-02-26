@@ -186,6 +186,11 @@ export const buildCommands = (
     })
   )
   commands.push(
+    buildCommand(['task-exchange'], emptySchema, async (): Promise<void> => {
+      await actions.exchangeTask(safeCharacter().getName())
+    })
+  )
+  commands.push(
     buildCommand(
       ['deposit'],
       itemQuantitySchema,

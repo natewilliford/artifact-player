@@ -65,6 +65,28 @@ export const depositOperation = (
   }
 }
 
+export const depositAllOperation = (
+  c: Character,
+  codes: string[]
+): Operation => {
+  return async () => {
+    const codeSet = new Set(codes)
+
+    const promises: Promise<Maybe<Error>>[] = []
+    c.characterSchema.inventory.forEach((slot) => {
+      if (slot.code && slot.quantity > 0 && codeSet.has(slot.code)) {
+        promises.push(
+          actions.depositBank(c.getName(), slot.code, slot.quantity)
+        )
+      }
+    })
+
+    const results = await Promise.all(promises)
+    // Just return the first error if we got any.
+    return results.find((e) => e)
+  }
+}
+
 export const withdrawOperation = (
   c: Character,
   code: string,

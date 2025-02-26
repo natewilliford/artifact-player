@@ -25,13 +25,7 @@ export const buildBehaviors = (): BehaviorObj[] => {
 
   behaviors.push({
     name: 'gather-wood',
-    buildGraph: (c: Character) =>
-      buildGatherWoodGraph({
-        character: c,
-        gatherLocation: { x: -1, y: 0 },
-        gatherAmount: 10,
-        gatherItemCode: 'ash_wood',
-      }),
+    buildGraph: (c: Character) => buildGatherWoodGraph(c),
   })
 
   behaviors.push({

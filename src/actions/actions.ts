@@ -44,9 +44,13 @@ export default {
     if (res.data) {
       character.updateCharacter(res.data.character)
       const newPos = character.getPosition()
-      console.log(
-        `${character.getName()} moved to ${newPos.x}, ${newPos.y} - ${res.data.destination.name}`
-      )
+
+      let logMessage = `${character.getName()} moved to ${newPos.x}, ${newPos.y} - ${res.data.destination.name}`
+      const mapContent = res.data.destination.content
+      if (mapContent) {
+        logMessage = `${logMessage} - ${mapContent.type}: ${mapContent.code}`
+      }
+      console.log(logMessage)
       character.getCoolDownExpiration()
     }
     return res.error
@@ -189,6 +193,16 @@ export default {
     if (res.data) {
       character.updateCharacter(res.data.character)
       console.log(`${character.getName()} completed task. Rewards: `)
+      logRewards(res.data.rewards)
+    }
+    return res.error
+  },
+  exchangeTask: async (name: string): Promise<Maybe<Error>> => {
+    const character = localState.getCharacter(name)
+    const res = await api.exchangeTasks(character.getName())
+    if (res.data) {
+      character.updateCharacter(res.data.character)
+      console.log(`${character.getName()} exchanged task. Rewards: `)
       logRewards(res.data.rewards)
     }
     return res.error

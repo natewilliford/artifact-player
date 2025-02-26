@@ -84,6 +84,11 @@ export default {
   ): Promise<ApiResponse<RewardDataSchema>> => {
     return await doPost(`/my/${name}/action/task/complete`)
   },
+  exchangeTasks: async (
+    name: string
+  ): Promise<ApiResponse<RewardDataSchema>> => {
+    return await doPost(`/my/${name}/action/task/exchange`)
+  },
   getBankDetails: async (): Promise<ApiResponse<BankSchema>> => {
     return await doGet('/my/bank')
   },
