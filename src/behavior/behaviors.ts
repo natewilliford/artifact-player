@@ -3,6 +3,7 @@ import { Graph } from './decisiongraph/graph.js'
 import { buildChickenFightGraph } from './graphs/chickenFightGraph.js'
 import { buildGatherWoodGraph } from './graphs/collectWoodGraph.js'
 import { buildFishingGraph } from './graphs/fishingGraph.js'
+import { buildYellowSlimeFightGraph } from './graphs/yellowSlimeTaskGraph.js'
 
 export type BehaviorObj = {
   name: string
@@ -13,7 +14,7 @@ export const buildBehaviors = (): BehaviorObj[] => {
   const behaviors: BehaviorObj[] = []
 
   behaviors.push({
-    name: 'fight-chicken',
+    name: 'fight-chickens',
     buildGraph: (c: Character) => buildChickenFightGraph(c),
   })
 
@@ -31,6 +32,11 @@ export const buildBehaviors = (): BehaviorObj[] => {
         gatherAmount: 10,
         gatherItemCode: 'ash_wood',
       }),
+  })
+
+  behaviors.push({
+    name: 'fight-yellow-slimes',
+    buildGraph: (c: Character) => buildYellowSlimeFightGraph(c),
   })
 
   return behaviors

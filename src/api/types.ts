@@ -57,7 +57,9 @@ export type CharacterSchema = {
 
   task: string
   task_type: string
+  /** The number of items completed out of total. */
   task_progress: number
+  /** The total number of task items required. */
   task_total: number
 }
 

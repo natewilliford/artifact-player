@@ -21,7 +21,7 @@ export const buildFishingGraph = (c: Character): Graph => {
   const fishingLoc: Pos = { x: 4, y: 2 }
   const cookingWorkshop: Pos = { x: 1, y: 1 }
   const bank: Pos = { x: 4, y: 1 }
-  const batchCount = 5
+  const batchCount = 20
 
   g.startingNode = buildNode('start', noop)
   g.addNode(g.startingNode)

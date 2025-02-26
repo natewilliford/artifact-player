@@ -87,3 +87,9 @@ export const bankHasLessThanItems = (
     return bank.getItemCount(code) < quantity
   }
 }
+
+export const taskDoneTrigger = (c: Character): Trigger => {
+  return () => {
+    return c.characterSchema.task_progress >= c.characterSchema.task_total
+  }
+}
