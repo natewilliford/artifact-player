@@ -16,6 +16,7 @@ import {
   Slot,
   TaskDataSchema,
   TaskFullSchema,
+  TaskTradeDataSchema,
   UseItemSchema,
 } from './types.js'
 
@@ -88,6 +89,13 @@ export default {
     name: string
   ): Promise<ApiResponse<RewardDataSchema>> => {
     return await doPost(`/my/${name}/action/task/exchange`)
+  },
+  tradeTaskItems: async (
+    name: string,
+    code: string,
+    quantity: number
+  ): Promise<ApiResponse<TaskTradeDataSchema>> => {
+    return await doPost(`/my/${name}/action/task/trade`, { code, quantity })
   },
   getBankDetails: async (): Promise<ApiResponse<BankSchema>> => {
     return await doGet('/my/bank')

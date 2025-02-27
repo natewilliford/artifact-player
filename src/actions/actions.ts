@@ -207,6 +207,21 @@ export default {
     }
     return res.error
   },
+  tradeTaskItems: async (
+    name: string,
+    code: string,
+    quantity: number
+  ): Promise<Maybe<Error>> => {
+    const character = localState.getCharacter(name)
+    const res = await api.tradeTaskItems(character.getName(), code, quantity)
+    if (res.data) {
+      character.updateCharacter(res.data.character)
+      console.log(
+        `${character.getName()} traded in ${res.data.trade.quantity}x ${res.data.trade.code}`
+      )
+    }
+    return res.error
+  },
   printTaskStatus: async (name: string) => {
     const character = localState.getCharacter(name)
     const cs = character.characterSchema

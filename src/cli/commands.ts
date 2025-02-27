@@ -50,7 +50,7 @@ export const buildCommands = (
   )
   commands.push(
     buildCommand(
-      ['select'],
+      ['select', 'sel'],
       nameSchema,
       async (args: z.infer<typeof nameSchema>): Promise<void> => {
         const c = localState.getCharacter(args[0])
@@ -192,10 +192,41 @@ export const buildCommands = (
   )
   commands.push(
     buildCommand(
+      ['task-trade-items'],
+      itemQuantitySchema,
+      async (args: z.infer<typeof itemQuantitySchema>): Promise<void> => {
+        await actions.tradeTaskItems(
+          safeCharacter().getName(),
+          args[0],
+          args[1]
+        )
+      }
+    )
+  )
+  commands.push(
+    buildCommand(
       ['deposit'],
       itemQuantitySchema,
       async (args: z.infer<typeof itemQuantitySchema>): Promise<void> => {
         await actions.depositBank(safeCharacter().getName(), args[0], args[1])
+      }
+    )
+  )
+  commands.push(
+    buildCommand(
+      ['deposit-all'],
+      itemQuantitySchema,
+      async (args: z.infer<typeof itemQuantitySchema>): Promise<void> => {
+        const c = safeCharacter()
+        const promises: Promise<Maybe<Error>>[] = []
+        c.characterSchema.inventory.forEach((slot) => {
+          if (slot.code && slot.quantity > 0) {
+            promises.push(
+              actions.depositBank(c.getName(), slot.code, slot.quantity)
+            )
+          }
+        })
+        await Promise.all(promises)
       }
     )
   )

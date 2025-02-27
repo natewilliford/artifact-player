@@ -202,3 +202,14 @@ export type UseItemSchema = {
   item: ItemSchema
   character: CharacterSchema
 }
+
+export type TaskTradeSchema = {
+  code: string
+  quantity: number
+}
+
+export type TaskTradeDataSchema = {
+  cooldown: CooldownSchema
+  trade: TaskTradeSchema
+  character: CharacterSchema
+}
