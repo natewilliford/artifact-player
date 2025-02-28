@@ -94,10 +94,8 @@ class Graph {
       if (this.operationError) {
         const newError = await this.resolveError()
         if (newError) {
-          console.log("Couldn't resolve error. Killing graph.")
+          console.log('Error trying to fix error. Killing graph.')
           this.running = false
-        } else {
-          this.operationError = undefined
         }
         continue
       }
@@ -136,10 +134,17 @@ class Graph {
       if (node) {
         const opError = await node.doOperation()
         if (opError) {
+          if (this.operationError) {
+            console.log('Multiple errors. Killing graph.')
+            this.running = false
+          }
+
           this.operationError = {
             error: opError,
             node: node.id,
           }
+        } else {
+          this.operationError = undefined
         }
       }
     }
