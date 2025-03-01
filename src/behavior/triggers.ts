@@ -4,6 +4,10 @@ import { Trigger } from './decisiongraph/graph.js'
 
 export const alwaysTrigger: Trigger = () => true
 
+export const invert = (t: Trigger): Trigger => {
+  return (): boolean => !t()
+}
+
 export const healthPercentTrigger = (
   c: Character,
   healthAmount: number
@@ -50,14 +54,6 @@ export const hasItemsTrigger = (
   return () => c.getItemCount(code) >= quantity
 }
 
-export const hasLessThanItemsTrigger = (
-  c: Character,
-  code: string,
-  quantity: number
-): Trigger => {
-  return () => c.getItemCount(code) < quantity
-}
-
 export const bankHasItemsTrigger = (
   c: Character,
   code: string,
@@ -70,21 +66,6 @@ export const bankHasItemsTrigger = (
       return false
     }
     return bank.getItemCount(code) >= quantity
-  }
-}
-
-export const bankHasLessThanItems = (
-  c: Character,
-  code: string,
-  quantity: number
-): Trigger => {
-  return () => {
-    const bank = localState.getBank()
-    if (!bank) {
-      console.warn("Couldn't get bank local state.")
-      return false
-    }
-    return bank.getItemCount(code) < quantity
   }
 }
 

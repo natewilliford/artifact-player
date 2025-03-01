@@ -10,7 +10,7 @@ import {
   alwaysTrigger,
   atPositionTrigger,
   hasItemsTrigger,
-  hasLessThanItemsTrigger,
+  invert,
 } from '../triggers.js'
 import { addCooldownNode } from './helpers.js'
 
@@ -56,7 +56,7 @@ export const buildGatherGraph = (c: Character, params: GatherGraphParams) => {
   g.addEdge(
     'deposit',
     'move-gather',
-    hasLessThanItemsTrigger(c, params.itemCode, params.batchCount)
+    invert(hasItemsTrigger(c, params.itemCode, params.batchCount))
   )
 
   return g

@@ -13,11 +13,10 @@ import {
   alwaysTrigger,
   atPositionTrigger,
   bankHasItemsTrigger,
-  bankHasLessThanItems,
   hasItemsTrigger,
-  hasLessThanItemsTrigger,
   healthAboveTrigger,
   healthBelowTrigger,
+  invert,
 } from '../triggers.js'
 import { addCooldownNode } from './helpers.js'
 
@@ -48,10 +47,15 @@ export const buildFightGraph = (
   g.buildAndAddNode('fight', fightOperation(c))
   addCooldownNode(g, 'fight', c)
   g.addEdge('fight', 'heal', healthBelowTrigger(c, healBelow))
+  g.addEdge(
+    'fight',
+    'move-fight',
+    invert(atPositionTrigger(c, params.fightLocation))
+  )
 
   g.addNode(buildNode('heal', useItemOperation(c, params.healItem, 1)))
   addCooldownNode(g, 'heal', c)
-  g.addEdge('heal', 'move-bank', hasLessThanItemsTrigger(c, params.healItem, 1))
+  g.addEdge('heal', 'move-bank', invert(hasItemsTrigger(c, params.healItem, 1)))
   g.addEdge('heal', 'fight', healthAboveTrigger(c, healBelow))
 
   g.buildAndAddNode('move-bank', moveOperation(c, params.bank))
@@ -66,7 +70,7 @@ export const buildFightGraph = (
     g.addEdge(
       'deposit',
       'check-amount',
-      hasLessThanItemsTrigger(c, params.depositItems[0], 1)
+      invert(hasItemsTrigger(c, params.depositItems[0], 1))
     )
   } else {
     g.addEdge('move-bank', 'check-amount', atPositionTrigger(c, params.bank))
@@ -76,7 +80,7 @@ export const buildFightGraph = (
   g.addEdge(
     'check-amount',
     'wait',
-    bankHasLessThanItems(c, params.healItem, params.healItemCount)
+    invert(bankHasItemsTrigger(c, params.healItem, params.healItemCount))
   )
   g.addEdge(
     'check-amount',

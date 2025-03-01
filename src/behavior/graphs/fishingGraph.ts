@@ -11,7 +11,7 @@ import {
   alwaysTrigger,
   atPositionTrigger,
   hasItemsTrigger,
-  hasLessThanItemsTrigger,
+  invert,
 } from '../triggers.js'
 import { addCooldownNode } from './helpers.js'
 
@@ -59,7 +59,7 @@ export const buildFishingGraph = (c: Character): Graph => {
   g.addEdge(
     'deposit',
     'move-fishing',
-    hasLessThanItemsTrigger(c, 'cooked_gudgeon', batchCount)
+    invert(hasItemsTrigger(c, 'cooked_gudgeon', batchCount))
   )
 
   return g

@@ -15,6 +15,13 @@ type Node = {
   doOperation: Operation
 }
 
+enum NodeState {
+  CheckTriggers,
+  Run,
+  Error,
+  Finishing,
+}
+
 const buildNode = (nodeId: string, op: Operation) => {
   return {
     id: nodeId,
@@ -38,9 +45,12 @@ class Graph {
 
   // Character for logging. Ops should have their own ref.
   character: Character
-  running = false
   runningPromise?: Promise<void>
   onEndCallback?: () => void
+
+  running = true
+  node?: Node
+  nodeState: NodeState = NodeState.CheckTriggers
 
   constructor(c: Character) {
     this.character = c
@@ -80,76 +90,97 @@ class Graph {
   // Returns imediately, but graph runs async.
   runGraph() {
     this.running = true
+    this.nodeState = NodeState.CheckTriggers // The first stage.
     this.runningPromise = this.doRunGraph()
   }
 
   async doRunGraph() {
-    let node = this.startingNode
-    while (this.running) {
-      if (!node) {
+    this.node = this.startingNode
+
+    while (this.running && this.nodeState !== NodeState.Finishing) {
+      if (!this.node) {
         console.warn(`Null node.`)
         break
       }
-
-      if (this.operationError) {
-        const newError = await this.resolveError()
-        if (newError) {
-          console.log('Error trying to fix error. Killing graph.')
-          this.running = false
-        }
-        continue
+      if (this.node.id === 'end') {
+        console.log('Reached end node')
+        break
       }
 
-      if (node.id === 'end') {
-        this.running = false
-        continue
-      }
-
-      const edges = this.edges.get(node.id)
-      if (!edges || edges.length === 0) {
-        console.warn(`Node ${node.id} has no edges. Finishing.`)
-        this.running = false
-        continue
-      }
-      // Reset the loop (can't just call continue in the inner for loop).
-      let shouldContinue = false
-      for (let i = 0; i < edges.length; i++) {
-        let e = edges[i]
-        if (e.shouldTrigger()) {
-          console.log(
-            `${this.character.getName()}: ${e.fromNodeId} -> ${e.toNodeId}`
-          )
-          node = this.nodes.get(e.toNodeId)
-          if (!node) {
-            console.warn(`Null node with id ${e.toNodeId}`)
-            this.running = false
-            break
-          }
-          shouldContinue = true
+      switch (this.nodeState) {
+        case NodeState.CheckTriggers:
+          await this.handleCheckTriggersState()
           break
-        }
-      }
-      if (shouldContinue) continue
-
-      if (node) {
-        const opError = await node.doOperation()
-        if (opError) {
-          if (this.operationError) {
-            console.log('Multiple errors. Killing graph.')
-            this.running = false
-          }
-
-          this.operationError = {
-            error: opError,
-            node: node.id,
-          }
-        } else {
-          this.operationError = undefined
-        }
+        case NodeState.Run:
+          await this.handleRunState()
+          break
+        case NodeState.Error:
+          await this.handleErrorState()
+          break
       }
     }
     if (this.onEndCallback) {
       this.onEndCallback()
+    }
+  }
+
+  async handleCheckTriggersState() {
+    if (!this.node) return
+
+    console.log('Check trigger state')
+
+    const edges = this.edges.get(this.node.id)
+    if (!edges || edges.length === 0) {
+      console.warn(`Node ${this.node?.id} has no edges. Finishing.`)
+      this.nodeState = NodeState.Finishing
+      return
+    }
+
+    for (let i = 0; i < edges.length; i++) {
+      let e = edges[i]
+      if (e.shouldTrigger()) {
+        console.log(
+          `${this.character.getName()}: ${e.fromNodeId} -> ${e.toNodeId}`
+        )
+        this.node = this.nodes.get(e.toNodeId)
+        // Stay in trigger state.
+        return
+      }
+    }
+    this.nodeState = NodeState.Run
+  }
+
+  async handleRunState() {
+    if (!this.node) return
+
+    console.log('Run state')
+    const opError = await this.node.doOperation()
+    if (opError) {
+      this.nodeState = NodeState.Error
+      if (this.operationError) {
+        console.log('Multiple errors. Killing graph.')
+        this.nodeState = NodeState.Finishing
+      }
+
+      this.operationError = {
+        error: opError,
+        node: this.node.id,
+      }
+      return
+    }
+    this.operationError = undefined
+    this.nodeState = NodeState.CheckTriggers
+  }
+
+  async handleErrorState() {
+    console.log('Error state')
+
+    const newError = await this.resolveError()
+    if (newError) {
+      console.log('Error trying to fix error. Killing graph.')
+      this.nodeState = NodeState.Finishing
+    } else {
+      this.nodeState = NodeState.CheckTriggers
     }
   }
 
