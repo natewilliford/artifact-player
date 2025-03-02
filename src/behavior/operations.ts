@@ -1,7 +1,7 @@
 import actions from '../actions/actions.js'
 import { Character, Pos } from '../gamestate/character.js'
 import { delay } from '../util.js'
-import { Operation } from './decisiongraph/graph.js'
+import { Operation } from './graphs/types.js'
 
 export const noop: Operation = async () => null
 

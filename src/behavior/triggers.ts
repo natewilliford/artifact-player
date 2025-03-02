@@ -1,11 +1,17 @@
 import { Character, Pos } from '../gamestate/character.js'
 import { localState } from '../gamestate/localstate.js'
-import { Trigger } from './decisiongraph/graph.js'
+import { Trigger } from './graphs/types.js'
 
 export const alwaysTrigger: Trigger = () => true
 
 export const invert = (t: Trigger): Trigger => {
-  return (): boolean => !t()
+  return (params): boolean => !t(params)
+}
+
+export const runCountTrigger = (count: number): Trigger => {
+  return (params) => {
+    return params.currentNodeRunCount >= count
+  }
 }
 
 export const healthPercentTrigger = (

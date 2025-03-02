@@ -5,6 +5,7 @@ import { Graph } from './decisiongraph/graph.js'
 import { buildFightGraph } from './graphs/fightGraph.js'
 import { buildFishingGraph } from './graphs/fishingGraph.js'
 import { buildGatherGraph } from './graphs/gatherGraph.js'
+import { buildSuperGraph } from './graphs/superGraph.js'
 
 export type BehaviorObj = {
   name: string
@@ -39,14 +40,15 @@ export const buildBehaviors = (): BehaviorObj[] => {
 
   behaviors.push({
     name: 'gather-wood',
-    buildGraph: (c: Character) =>
-      buildGatherGraph(c, {
-        itemCode: 'ash_wood',
-        anciliaryItemCodes: ['sap'],
-        gatherLocation: { x: 6, y: 1 },
-        bank: locations.bank,
-        batchCount: 20,
-      }),
+    // buildGraph: (c: Character) =>
+    //   buildGatherGraph(c, {
+    //     itemCode: 'ash_wood',
+    //     anciliaryItemCodes: ['sap'],
+    //     gatherLocation: { x: 6, y: 1 },
+    //     bank: locations.bank,
+    //     batchCount: 20,
+    //   }),
+    buildGraph: (c: Character) => buildSuperGraph(c),
   })
 
   behaviors.push({

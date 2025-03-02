@@ -1,26 +1,6 @@
 import actions from '../../actions/actions.js'
 import { Character } from '../../gamestate/character.js'
-
-type Trigger = () => boolean
-type Operation = () => Promise<Maybe<Error>>
-
-type Edge = {
-  shouldTrigger: Trigger
-  fromNodeId: string
-  toNodeId: string
-}
-
-type Node = {
-  id: string
-  doOperation: Operation
-}
-
-enum NodeState {
-  CheckTriggers,
-  Run,
-  Error,
-  Finishing,
-}
+import { Edge, Node, NodeState, Operation, Trigger } from '../graphs/types.js'
 
 const buildNode = (nodeId: string, op: Operation) => {
   return {
@@ -51,6 +31,7 @@ class Graph {
   running = true
   node?: Node
   nodeState: NodeState = NodeState.CheckTriggers
+  currentNodeRunCount = 0
 
   constructor(c: Character) {
     this.character = c
@@ -67,7 +48,7 @@ class Graph {
     this.addNode(buildNode(nodeId, op))
   }
 
-  addEdge(fromNode: string, toNode: string, condition: () => boolean) {
+  addEdge(fromNode: string, toNode: string, condition: Trigger) {
     const e: Edge = {
       fromNodeId: fromNode,
       toNodeId: toNode,
@@ -87,11 +68,11 @@ class Graph {
     return await actions.load()
   }
 
-  // Returns imediately, but graph runs async.
-  runGraph() {
+  async runGraph(): Promise<void> {
     this.running = true
     this.nodeState = NodeState.CheckTriggers // The first stage.
     this.runningPromise = this.doRunGraph()
+    return await this.runningPromise
   }
 
   async doRunGraph() {
@@ -126,9 +107,6 @@ class Graph {
 
   async handleCheckTriggersState() {
     if (!this.node) return
-
-    console.log('Check trigger state')
-
     const edges = this.edges.get(this.node.id)
     if (!edges || edges.length === 0) {
       console.warn(`Node ${this.node?.id} has no edges. Finishing.`)
@@ -138,11 +116,13 @@ class Graph {
 
     for (let i = 0; i < edges.length; i++) {
       let e = edges[i]
-      if (e.shouldTrigger()) {
+      if (e.shouldTrigger({ currentNodeRunCount: this.currentNodeRunCount })) {
         console.log(
           `${this.character.getName()}: ${e.fromNodeId} -> ${e.toNodeId}`
         )
         this.node = this.nodes.get(e.toNodeId)
+        // Reset run count when we move nodes.
+        this.currentNodeRunCount = 0
         // Stay in trigger state.
         return
       }
@@ -152,9 +132,8 @@ class Graph {
 
   async handleRunState() {
     if (!this.node) return
-
-    console.log('Run state')
     const opError = await this.node.doOperation()
+    this.currentNodeRunCount++
     if (opError) {
       this.nodeState = NodeState.Error
       if (this.operationError) {
@@ -173,8 +152,6 @@ class Graph {
   }
 
   async handleErrorState() {
-    console.log('Error state')
-
     const newError = await this.resolveError()
     if (newError) {
       console.log('Error trying to fix error. Killing graph.')
@@ -197,4 +174,4 @@ class Graph {
   }
 }
 
-export { buildNode, Graph, Node, Operation, Trigger }
+export { buildNode, Graph }
