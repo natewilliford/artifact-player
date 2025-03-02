@@ -1,3 +1,5 @@
+import { Graph } from '../decisiongraph/graph.js'
+
 export type TriggerParams = {
   currentNodeRunCount: number
 }
@@ -11,14 +13,11 @@ export type Edge = {
   toNodeId: string
 }
 
-export type Node = {
+export interface Node {
   id: string
   doOperation: Operation
 }
 
-export enum NodeState {
-  CheckTriggers,
-  Run,
-  Error,
-  Finishing,
+export interface GraphNode extends Node {
+  graph: Graph
 }

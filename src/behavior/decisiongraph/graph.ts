@@ -1,6 +1,13 @@
 import actions from '../../actions/actions.js'
 import { Character } from '../../gamestate/character.js'
-import { Edge, Node, NodeState, Operation, Trigger } from '../graphs/types.js'
+import { Edge, GraphNode, Node, Operation, Trigger } from '../graphs/types.js'
+
+enum NodeState {
+  CheckTriggers,
+  Run,
+  Error,
+  Finishing,
+}
 
 const buildNode = (nodeId: string, op: Operation) => {
   return {
@@ -17,6 +24,8 @@ class Graph {
 
   // Edges indexed on the from node id.
   edges: Map<string, Edge[]> = new Map()
+
+  subGraphs: Graph[] = []
 
   operationError?: {
     error: Error
@@ -37,10 +46,20 @@ class Graph {
     this.character = c
   }
 
+  isGraphNode(n: Node): n is GraphNode {
+    return 'graph' in n
+  }
+
   addNode(n: Node) {
     if (this.nodes.get(n.id)) {
       throw new Error('Graph already contains node with id: ' + n.id)
     }
+
+    if (this.isGraphNode(n)) {
+      console.log(`Adding graph node: ${n.id}`)
+      this.subGraphs.push(n.graph)
+    }
+
     this.nodes.set(n.id, n)
   }
 
@@ -163,6 +182,11 @@ class Graph {
 
   async stop(): Promise<void> {
     this.running = false
+
+    // We don't need to await any subgraphs since stopping their graph will
+    // eventually progress this graph.
+    this.subGraphs.forEach((sg) => sg.stop())
+
     if (this.runningPromise) {
       await this.runningPromise
     }

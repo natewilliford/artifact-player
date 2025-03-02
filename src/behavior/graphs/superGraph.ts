@@ -16,6 +16,7 @@ import {
   runCountTrigger,
 } from '../triggers.js'
 import { addCooldownNode } from './helpers.js'
+import { GraphNode } from './types.js'
 
 export const buildSuperGraph = (c: Character): Graph => {
   const params = {
@@ -55,7 +56,8 @@ export const buildSuperGraph = (c: Character): Graph => {
       await subGraph.runGraph()
       return
     },
-  })
+    graph: subGraph,
+  } as GraphNode)
   g.addEdge('deposit-subgraph', 'move-gather', runCountTrigger(1))
 
   return g
