@@ -1,7 +1,7 @@
 import actions from '../actions/actions.js'
 import { Character, Pos } from '../gamestate/character.js'
 import { delay } from '../util.js'
-import { Operation } from './graphs/types.js'
+import { Operation } from './decisiongraph/types.js'
 
 export const noop: Operation = async () => null
 
@@ -58,10 +58,16 @@ export const craftOperation = (
 export const depositOperation = (
   c: Character,
   code: string,
-  quantity: number
+  quantity?: number
 ): Operation => {
   return async () => {
-    return await actions.depositBank(c.getName(), code, quantity)
+    let depositAmount = c.getItemCount(code)
+    if (quantity !== undefined) {
+      depositAmount = Math.min(depositAmount, quantity)
+    }
+    if (depositAmount > 0) {
+      return await actions.depositBank(c.getName(), code, depositAmount)
+    }
   }
 }
 

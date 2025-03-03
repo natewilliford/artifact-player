@@ -1,6 +1,6 @@
 import { Character, Pos } from '../gamestate/character.js'
 import { localState } from '../gamestate/localstate.js'
-import { Trigger } from './graphs/types.js'
+import { Trigger } from './decisiongraph/types.js'
 
 export const alwaysTrigger: Trigger = () => true
 
@@ -46,10 +46,6 @@ export const atPositionTrigger = (c: Character, pos: Pos): Trigger => {
 
 export const hasCooldownTrigger = (c: Character): Trigger => {
   return () => c.getCooldownSecondsRemaining() > 0
-}
-
-export const cooldownDoneTrigger = (c: Character): Trigger => {
-  return () => c.getCooldownSecondsRemaining() === 0
 }
 
 export const hasItemsTrigger = (

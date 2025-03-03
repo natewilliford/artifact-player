@@ -1,18 +1,10 @@
 import { Character, Pos } from '../../gamestate/character.js'
 import { buildNode, Graph } from '../decisiongraph/graph.js'
-import {
-  depositAllOperation,
-  gatherOperation,
-  moveOperation,
-  noop,
-} from '../operations.js'
-import {
-  alwaysTrigger,
-  atPositionTrigger,
-  hasItemsTrigger,
-  invert,
-} from '../triggers.js'
-import { addCooldownNode } from './helpers.js'
+import { buildGraphNode } from '../decisiongraph/graphNode.js'
+import { noop } from '../operations.js'
+import { alwaysTrigger, runCountTrigger } from '../triggers.js'
+import { buildBankDepositSubgraph } from './subgraphs/bankDepositSubgraph.js'
+import { buildGatherSubgraph } from './subgraphs/gatherSubgraph.js'
 
 export type GatherGraphParams = {
   itemCode: string
@@ -21,43 +13,27 @@ export type GatherGraphParams = {
   bank: Pos
   batchCount: number
 }
+
 export const buildGatherGraph = (c: Character, params: GatherGraphParams) => {
   const g = new Graph(c)
 
   g.startingNode = buildNode('start', noop)
   g.addNode(g.startingNode)
-  g.addEdge('start', 'move-gather', alwaysTrigger)
+  g.addEdge('start', 'gather-subgraph', alwaysTrigger)
 
-  g.buildAndAddNode('move-gather', moveOperation(c, params.gatherLocation))
-  addCooldownNode(g, 'move-gather', c)
-  g.addEdge(
-    'move-gather',
-    'gather',
-    atPositionTrigger(c, params.gatherLocation)
-  )
+  g.addNode(buildGraphNode('gather-subgraph', buildGatherSubgraph(c, params)))
+  g.addEdge('gather-subgraph', 'deposit-subgraph', runCountTrigger(1))
 
-  g.buildAndAddNode('gather', gatherOperation(c))
-  addCooldownNode(g, 'gather', c)
-  g.addEdge(
-    'gather',
-    'move-bank',
-    hasItemsTrigger(c, params.itemCode, params.batchCount)
+  g.addNode(
+    buildGraphNode(
+      'deposit-subgraph',
+      buildBankDepositSubgraph(c, {
+        bank: params.bank,
+        itemCodes: [params.itemCode, ...params.anciliaryItemCodes],
+      })
+    )
   )
-
-  g.buildAndAddNode('move-bank', moveOperation(c, params.bank))
-  addCooldownNode(g, 'move-bank', c)
-  g.addEdge('move-bank', 'deposit', atPositionTrigger(c, params.bank))
-
-  g.buildAndAddNode(
-    'deposit',
-    depositAllOperation(c, [params.itemCode, ...params.anciliaryItemCodes])
-  )
-  addCooldownNode(g, 'deposit', c)
-  g.addEdge(
-    'deposit',
-    'move-gather',
-    invert(hasItemsTrigger(c, params.itemCode, params.batchCount))
-  )
+  g.addEdge('deposit-subgraph', 'gather-subgraph', runCountTrigger(1))
 
   return g
 }

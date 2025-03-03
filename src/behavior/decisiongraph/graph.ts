@@ -1,19 +1,14 @@
 import actions from '../../actions/actions.js'
 import { Character } from '../../gamestate/character.js'
-import { Edge, GraphNode, Node, Operation, Trigger } from '../graphs/types.js'
+import { isGraphNode } from './graphNode.js'
+import { buildNode, Node } from './node.js'
+import { Edge, Operation, Trigger } from './types.js'
 
 enum NodeState {
   CheckTriggers,
   Run,
   Error,
   Finishing,
-}
-
-const buildNode = (nodeId: string, op: Operation) => {
-  return {
-    id: nodeId,
-    doOperation: op,
-  }
 }
 
 class Graph {
@@ -46,16 +41,12 @@ class Graph {
     this.character = c
   }
 
-  isGraphNode(n: Node): n is GraphNode {
-    return 'graph' in n
-  }
-
   addNode(n: Node) {
     if (this.nodes.get(n.id)) {
       throw new Error('Graph already contains node with id: ' + n.id)
     }
 
-    if (this.isGraphNode(n)) {
+    if (isGraphNode(n)) {
       console.log(`Adding graph node: ${n.id}`)
       this.subGraphs.push(n.graph)
     }
