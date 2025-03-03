@@ -45,7 +45,7 @@ export const buildBehaviors = (): BehaviorObj[] => {
         anciliaryItemCodes: [items.resources.sap],
         gatherLocation: locations.ashWood2,
         bank: locations.bank,
-        batchCount: 3,
+        batchCount: 20,
       }),
   })
 
